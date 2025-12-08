@@ -1,11 +1,7 @@
 import { router } from "expo-router";
 import { Text, YStack } from "tamagui";
 
-import {
-  PrimaryButton,
-  ScreenContainer,
-  SecondaryButton,
-} from "@/components/ui";
+import { ScreenContainer, SecondaryButton, StarBorder } from "@/components/ui";
 
 export default function WelcomeScreen() {
   const handleGetStarted = () => {
@@ -35,7 +31,11 @@ export default function WelcomeScreen() {
         </YStack>
 
         <YStack gap="$3" width="100%" maxWidth={300}>
-          <PrimaryButton onPress={handleGetStarted}>Get started</PrimaryButton>
+          <StarBorder color="#3b82f6" speed={6000} onPress={handleGetStarted}>
+            <Text textAlign="center" width="100%">
+              Get started
+            </Text>
+          </StarBorder>
 
           <SecondaryButton onPress={handleLogin}>
             I already have an account
