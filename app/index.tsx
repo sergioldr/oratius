@@ -2,6 +2,7 @@ import { router } from "expo-router";
 import { Text, YStack } from "tamagui";
 
 import { ScreenContainer, SecondaryButton, StarBorder } from "@/components/ui";
+import { VoiceOrb } from "@/components/voice-orb";
 
 export default function WelcomeScreen() {
   const handleGetStarted = () => {
@@ -15,7 +16,16 @@ export default function WelcomeScreen() {
 
   return (
     <ScreenContainer centered>
-      <YStack alignItems="center" gap="$6" paddingHorizontal="$4">
+      <YStack alignItems="center" gap="$6" paddingHorizontal="$4" width="100%">
+        <VoiceOrb
+          isRecording={false}
+          glowOpacity={0.3}
+          scale={1}
+          amplitude={0.3}
+          speed={1}
+          orbColor={[0.23, 0.51, 0.96]}
+        />
+
         <YStack alignItems="center" gap="$3">
           <Text fontSize="$10" fontWeight="bold" color="$color">
             Oratory Coach
@@ -30,11 +40,9 @@ export default function WelcomeScreen() {
           </Text>
         </YStack>
 
-        <YStack gap="$3" width="100%" maxWidth={300}>
-          <StarBorder color="#3b82f6" speed={6000} onPress={handleGetStarted}>
-            <Text textAlign="center" width="100%">
-              Get started
-            </Text>
+        <YStack gap="$3" width="100%" alignSelf="stretch">
+          <StarBorder color="#cfc7fa" speed={6000} onPress={handleGetStarted}>
+            Get started
           </StarBorder>
 
           <SecondaryButton onPress={handleLogin}>

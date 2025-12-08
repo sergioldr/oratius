@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Text } from "tamagui";
 
 const AnimatedView = Animated.createAnimatedComponent(View);
 
@@ -78,7 +79,15 @@ const StarBorder: React.FC<StarBorderProps> = ({
         onLayout={onLayout}
         style={[styles.container, { paddingVertical: thickness }, style]}
       >
-        <View style={styles.innerContent}>{children}</View>
+        <View style={styles.innerContent}>
+          {typeof children === "string" ? (
+            <Text textAlign="center" width="100%" fontWeight="600">
+              {children}
+            </Text>
+          ) : (
+            children
+          )}
+        </View>
       </TouchableOpacity>
     );
   }
@@ -159,7 +168,15 @@ const StarBorder: React.FC<StarBorderProps> = ({
       </AnimatedView>
 
       {/* Contenido del botón (equivalente a .inner-content) */}
-      <View style={styles.innerContent}>{children}</View>
+      <View style={styles.innerContent}>
+        {typeof children === "string" ? (
+          <Text textAlign="center" width="100%" fontSize={16} fontWeight="500">
+            {children}
+          </Text>
+        ) : (
+          children
+        )}
+      </View>
     </TouchableOpacity>
   );
 };
@@ -189,6 +206,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: "hidden",
     alignSelf: "stretch",
+    width: "100%",
   },
   glowBase: {
     position: "absolute",
@@ -211,6 +229,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     zIndex: 1,
+    width: "100%",
   },
 });
 
