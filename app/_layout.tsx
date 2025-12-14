@@ -19,6 +19,7 @@ import { TamaguiProvider, Theme } from "tamagui";
 
 import { UserProvider } from "@/context/user-context";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import "@/locales";
 import config from "../tamagui.config";
 
 SplashScreen.preventAutoHideAsync();

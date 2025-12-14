@@ -1,10 +1,10 @@
 import { Button, type ButtonProps } from "tamagui";
 
-interface SecondaryButtonProps extends ButtonProps {
+interface GhostButtonProps extends ButtonProps {
   children: React.ReactNode;
 }
 
-export function SecondaryButton({ children, ...props }: SecondaryButtonProps) {
+export function GhostButton({ children, ...props }: GhostButtonProps) {
   return (
     <Button
       backgroundColor="transparent"

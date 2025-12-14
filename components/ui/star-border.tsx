@@ -169,6 +169,12 @@ const StarBorder: React.FC<StarBorderProps> = ({
 
       {/* Contenido del botón (equivalente a .inner-content) */}
       <View style={styles.innerContent}>
+        <LinearGradient
+          colors={["#000000", "#101828"]}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+          style={StyleSheet.absoluteFill}
+        />
         {typeof children === "string" ? (
           <Text textAlign="center" width="100%" fontSize={16} fontWeight="500">
             {children}
@@ -221,8 +227,8 @@ const styles = StyleSheet.create({
   innerContent: {
     position: "relative",
     borderWidth: 1,
-    borderColor: "#222",
-    backgroundColor: "#000",
+    borderColor: "#1f2937",
+    overflow: "hidden",
     paddingVertical: 14,
     paddingHorizontal: 26,
     borderRadius: 20,

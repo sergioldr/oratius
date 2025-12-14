@@ -1,10 +1,13 @@
 import { router } from "expo-router";
-import { Text, YStack } from "tamagui";
+import { useTranslation } from "react-i18next";
+import { Paragraph, Text, YStack } from "tamagui";
 
-import { ScreenContainer, SecondaryButton, StarBorder } from "@/components/ui";
+import { GhostButton, ScreenContainer, StarBorder } from "@/components/ui";
 import { VoiceOrb } from "@/components/voice-orb";
 
 export default function WelcomeScreen() {
+  const { t } = useTranslation();
+
   const handleGetStarted = () => {
     router.push("/name");
   };
@@ -28,26 +31,19 @@ export default function WelcomeScreen() {
 
         <YStack alignItems="center" gap="$3">
           <Text fontSize="$10" fontWeight="bold" color="$color">
-            Oratory Coach
+            {t("welcome.title")}
           </Text>
-          <Text
-            fontSize="$5"
-            color="$gray11"
-            textAlign="center"
-            lineHeight="$2"
-          >
-            AI-powered training for confident speaking.
-          </Text>
+          <Paragraph textAlign="center" color="$white8">
+            {t("welcome.subtitle")}
+          </Paragraph>
         </YStack>
 
         <YStack gap="$3" width="100%" alignSelf="stretch">
           <StarBorder color="#cfc7fa" speed={6000} onPress={handleGetStarted}>
-            Get started
+            {t("welcome.getStarted")}
           </StarBorder>
 
-          <SecondaryButton onPress={handleLogin}>
-            I already have an account
-          </SecondaryButton>
+          <GhostButton onPress={handleLogin}>{t("welcome.login")}</GhostButton>
         </YStack>
       </YStack>
     </ScreenContainer>

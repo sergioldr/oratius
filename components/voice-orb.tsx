@@ -33,7 +33,7 @@ export function VoiceOrb({
   style,
   onPress,
 }: VoiceOrbProps) {
-  const glowColor = isRecording ? "rgb(244, 63, 94)" : "rgb(59, 130, 246)"; // rose-500 / blue-500
+  const glowColor = isRecording ? "rgb(244, 63, 94)" : "rgb(59, 130, 246)";
   const shadowColor = isRecording
     ? "rgba(255, 182, 193, 0.45)"
     : "rgba(58, 108, 255, 0.45)";

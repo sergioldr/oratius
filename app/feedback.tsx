@@ -1,11 +1,7 @@
 import { router } from "expo-router";
 import { Card, Text, YStack } from "tamagui";
 
-import {
-  PrimaryButton,
-  ScreenContainer,
-  SecondaryButton,
-} from "@/components/ui";
+import { GhostButton, PrimaryButton, ScreenContainer } from "@/components/ui";
 
 // TODO: Replace with real AI feedback from backend
 const MOCK_FEEDBACK = [
@@ -61,7 +57,7 @@ export default function FeedbackScreen() {
 
         <YStack gap="$3">
           <PrimaryButton onPress={handleFinish}>Finish</PrimaryButton>
-          <SecondaryButton onPress={handleTryAgain}>Try again</SecondaryButton>
+          <GhostButton onPress={handleTryAgain}>Try again</GhostButton>
         </YStack>
       </YStack>
     </ScreenContainer>
