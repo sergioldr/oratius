@@ -20,5 +20,48 @@
     "getStarted": "Start Practicing",
     "loginPrompt": "Already have an account?",
     "login": "Log in"
+  },
+  "home": {
+    "greeting": {
+      "morning": "Good morning,",
+      "afternoon": "Good afternoon,",
+      "evening": "Good evening,"
+    },
+    "title": "Ready to speak?",
+    "subtitle": "Choose your focus for today's session.",
+    "stats": {
+      "streak": "Streak",
+      "avgScore": "Avg Score",
+      "days": "Days"
+    },
+    "mode": {
+      "title": "Select Mode",
+      "pitch": "Pitch",
+      "interview": "Interview"
+    },
+    "pitchAbout": {
+      "title": "Whats your pitch about?",
+      "startup": "Startup idea",
+      "product": "Product",
+      "yourself": "Yourself"
+    },
+    "interviewType": {
+      "title": "What are you preparing for?",
+      "external": "External Job Interview (new role, headhunter)",
+      "internal": "Internal Promotion / Role Change",
+      "behavioral": "Behavioral / Competency-Based",
+      "technical": "Technical / Case Study",
+      "panel": "Panel / Group Interview",
+      "other": "Other"
+    },
+    "record": {
+      "title": "Record My Speech",
+      "subtitle": "AI analysis ready in seconds"
+    },
+    "tabs": {
+      "feedback": "Feedback",
+      "practice": "Practice",
+      "profile": "Profile"
+    }
   }
 }

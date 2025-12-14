@@ -15,7 +15,7 @@ export function PrimaryButton({
       color="$white1"
       size="$5"
       borderRadius="$4"
-      pressStyle={{ opacity: 0.8 }}
+      pressStyle={{ opacity: 0.9, backgroundColor: "$primary6" }}
       disabled={disabled}
       opacity={disabled ? 0.6 : 1}
       {...props}

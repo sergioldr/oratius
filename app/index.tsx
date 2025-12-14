@@ -14,7 +14,7 @@ export default function WelcomeScreen() {
   const { t } = useTranslation();
 
   const handleGetStarted = () => {
-    router.push("/name");
+    router.push("/home");
   };
 
   const handleLogin = () => {
@@ -68,7 +68,7 @@ export default function WelcomeScreen() {
           <Text
             fontSize="$4"
             textAlign="center"
-            color="$gray10"
+            color="$gray11"
             marginBottom="$5"
             paddingHorizontal="$4"
             maxWidth={320}
@@ -105,7 +105,6 @@ export default function WelcomeScreen() {
             color="white"
             size="$5"
             borderRadius="$10"
-            pressStyle={{ opacity: 0.9, scale: 0.98 }}
             onPress={handleGetStarted}
             shadowColor="$primary6"
             shadowOffset={{ width: 0, height: 4 }}
@@ -123,7 +122,7 @@ export default function WelcomeScreen() {
 
           {/* Login Link */}
           <XStack justifyContent="center" alignItems="center" gap="$1">
-            <Text fontSize="$4" color="$gray10">
+            <Text fontSize="$4" color="$gray11">
               {t("welcome.loginPrompt")}
             </Text>
             <GhostButton onPress={handleLogin} size="$3" paddingHorizontal="$1">

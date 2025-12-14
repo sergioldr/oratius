@@ -20,5 +20,48 @@
     "getStarted": "Comenzar a Practicar",
     "loginPrompt": "¿Ya tienes una cuenta?",
     "login": "Iniciar sesión"
+  },
+  "home": {
+    "greeting": {
+      "morning": "Buenos días,",
+      "afternoon": "Buenas tardes,",
+      "evening": "Buenas noches,"
+    },
+    "title": "¿Listo para hablar?",
+    "subtitle": "Elige tu enfoque para la sesión de hoy.",
+    "stats": {
+      "streak": "Racha",
+      "avgScore": "Puntaje Prom.",
+      "days": "Días"
+    },
+    "mode": {
+      "title": "Selecciona Modo",
+      "pitch": "Pitch",
+      "interview": "Entrevista"
+    },
+    "pitchAbout": {
+      "title": "¿De qué trata tu pitch?",
+      "startup": "Idea de startup",
+      "product": "Producto",
+      "yourself": "Sobre ti"
+    },
+    "interviewType": {
+      "title": "¿Para qué te estás preparando?",
+      "external": "Entrevista Externa (nuevo rol, headhunter)",
+      "internal": "Promoción Interna / Cambio de Rol",
+      "behavioral": "Conductual / Basada en Competencias",
+      "technical": "Técnica / Caso de Estudio",
+      "panel": "Panel / Entrevista Grupal",
+      "other": "Otro"
+    },
+    "record": {
+      "title": "Grabar Mi Discurso",
+      "subtitle": "Análisis de IA listo en segundos"
+    },
+    "tabs": {
+      "feedback": "Feedback",
+      "practice": "Práctica",
+      "profile": "Perfil"
+    }
   }
 }

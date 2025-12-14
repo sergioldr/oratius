@@ -15,8 +15,9 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
-import { TamaguiProvider, Theme } from "tamagui";
+import { TamaguiProvider, Theme, YStack } from "tamagui";
 
+import { BottomTabBar } from "@/components/bottom-tab-bar";
 import { UserProvider } from "@/context/user-context";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import "@/locales";
@@ -51,15 +52,13 @@ export default function RootLayout() {
           value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
           <UserProvider>
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="index" />
-              <Stack.Screen name="name" />
-              <Stack.Screen name="goal" />
-              <Stack.Screen name="home" />
-              <Stack.Screen name="prompt" />
-              <Stack.Screen name="recording" />
-              <Stack.Screen name="feedback" />
-            </Stack>
+            <YStack flex={1}>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="index" />
+                <Stack.Screen name="home" />
+              </Stack>
+              <BottomTabBar />
+            </YStack>
             <StatusBar style="auto" />
           </UserProvider>
         </ThemeProvider>
