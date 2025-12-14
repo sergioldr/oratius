@@ -17,8 +17,8 @@ export function SelectableCard({
       bordered
       padding="$4"
       borderRadius="$4"
-      backgroundColor={selected ? "$blue2" : "$background"}
-      borderColor={selected ? "$blue10" : "$borderColor"}
+      backgroundColor={selected ? "$primary2" : "$background"}
+      borderColor={selected ? "$primary6" : "$borderColor"}
       borderWidth={selected ? 2 : 1}
       pressStyle={{ scale: 0.98 }}
       animation="quick"
@@ -29,7 +29,7 @@ export function SelectableCard({
         <Text
           fontSize="$5"
           fontWeight={selected ? "600" : "400"}
-          color={selected ? "$blue10" : "$color"}
+          color={selected ? "$primary6" : "$color"}
         >
           {title}
         </Text>

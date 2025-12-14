@@ -1,8 +1,24 @@
 {
   "welcome": {
-    "title": "Oratory Coach",
-    "subtitle": "Talk to Jarvis and get instant feedback on your tone, pace, and clarity.",
-    "getStarted": "Get started",
-    "login": "I already have an account"
+    "badge": "Your AI coach is ready to listen",
+    "title": "Speak with Confidence",
+    "subtitle": "Master your delivery with real-time analysis and personalized feedback.",
+    "features": {
+      "practice": {
+        "title": "Unlimited Practice",
+        "description": "Rehearse anytime, anywhere"
+      },
+      "feedback": {
+        "title": "Instant Feedback",
+        "description": "Get actionable tips immediately"
+      },
+      "progress": {
+        "title": "Visible Progress",
+        "description": "Track your confidence score"
+      }
+    },
+    "getStarted": "Start Practicing",
+    "loginPrompt": "Already have an account?",
+    "login": "Log in"
   }
 }

@@ -11,7 +11,7 @@ export function PrimaryButton({
 }: PrimaryButtonProps) {
   return (
     <Button
-      backgroundColor={disabled ? "$gray8" : "$blue10"}
+      backgroundColor={disabled ? "$gray8" : "$primary6"}
       color="$white1"
       size="$5"
       borderRadius="$4"

@@ -48,8 +48,8 @@ export default function HomeScreen() {
           bordered
           padding="$5"
           borderRadius="$6"
-          backgroundColor="$blue2"
-          borderColor="$blue6"
+          backgroundColor="$primary2"
+          borderColor="$primary4"
         >
           <YStack gap="$4">
             <YStack gap="$2">

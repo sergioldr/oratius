@@ -12,7 +12,7 @@ export function GhostButton({ children, ...props }: GhostButtonProps) {
       pressStyle={{ backgroundColor: "transparent", borderWidth: 0 }}
       hoverStyle={{ backgroundColor: "transparent", borderWidth: 0 }}
       focusStyle={{ backgroundColor: "transparent", borderWidth: 0 }}
-      color="$blue10"
+      color="$primary6"
       size="$4"
       {...props}
     >

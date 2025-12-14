@@ -1,8 +1,24 @@
 {
   "welcome": {
-    "title": "Oratory Coach",
-    "subtitle": "Esta experiencia utiliza inteligencia artificial para ayudarte a mejorar tus habilidades de oratoria. \n Habla con Jarvis y recibe retroalimentación inmediata sobre tu tono, ritmo y claridad.",
-    "getStarted": "Comenzar",
-    "login": "Ya tengo una cuenta"
+    "badge": "Tu coach de IA está listo para escucharte",
+    "title": "Habla con Confianza",
+    "subtitle": "Domina tu presentación con análisis en tiempo real y retroalimentación personalizada.",
+    "features": {
+      "practice": {
+        "title": "Práctica Ilimitada",
+        "description": "Ensaya en cualquier momento y lugar"
+      },
+      "feedback": {
+        "title": "Retroalimentación Instantánea",
+        "description": "Obtén consejos prácticos de inmediato"
+      },
+      "progress": {
+        "title": "Progreso Visible",
+        "description": "Rastrea tu puntuación de confianza"
+      }
+    },
+    "getStarted": "Comenzar a Practicar",
+    "loginPrompt": "¿Ya tienes una cuenta?",
+    "login": "Iniciar sesión"
   }
 }

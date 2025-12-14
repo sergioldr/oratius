@@ -1,7 +1,7 @@
 import type { ExpoWebGLRenderingContext } from "expo-gl";
 import { GLView } from "expo-gl";
 import React, { useCallback, useEffect, useRef } from "react";
-import { StyleSheet, View } from "react-native";
+import { AppState, AppStateStatus, StyleSheet, View } from "react-native";
 
 const vertexShaderSource = `
 attribute vec2 uv;
@@ -76,6 +76,11 @@ export function Iridescence({
 
   const amplitudeRef = useRef(amplitude);
   const speedRef = useRef(speed);
+
+  // Track if animation is running and app state
+  const isAnimatingRef = useRef(false);
+  const appStateRef = useRef(AppState.currentState);
+  const renderRef = useRef<((t: number) => void) | null>(null);
 
   // Keep refs in sync with props
   useEffect(() => {
@@ -216,7 +221,8 @@ export function Iridescence({
 
     // Animation loop
     const render = (t: number) => {
-      if (!glRef.current || !programRef.current) {
+      // Stop rendering if app is in background
+      if (!glRef.current || !programRef.current || !isAnimatingRef.current) {
         return;
       }
       const gl = glRef.current;
@@ -283,12 +289,50 @@ export function Iridescence({
       animationFrameRef.current = requestAnimationFrame(render);
     };
 
+    // Store render function in ref for AppState handler
+    renderRef.current = render;
+    isAnimatingRef.current = true;
     animationFrameRef.current = requestAnimationFrame(render);
+  }, []);
+
+  // Handle app state changes (background/foreground)
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+      if (
+        appStateRef.current.match(/inactive|background/) &&
+        nextAppState === "active"
+      ) {
+        // App has come to the foreground - restart animation
+        // Reset lastTimeRef to avoid large time jumps
+        lastTimeRef.current = undefined;
+        isAnimatingRef.current = true;
+        if (renderRef.current && glRef.current) {
+          animationFrameRef.current = requestAnimationFrame(renderRef.current);
+        }
+      } else if (nextAppState.match(/inactive|background/)) {
+        // App is going to background - stop animation
+        isAnimatingRef.current = false;
+        if (animationFrameRef.current != null) {
+          cancelAnimationFrame(animationFrameRef.current);
+          animationFrameRef.current = null;
+        }
+      }
+      appStateRef.current = nextAppState;
+    };
+
+    const subscription = AppState.addEventListener(
+      "change",
+      handleAppStateChange
+    );
+    return () => {
+      subscription.remove();
+    };
   }, []);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
+      isAnimatingRef.current = false;
       if (animationFrameRef.current != null) {
         cancelAnimationFrame(animationFrameRef.current);
       }

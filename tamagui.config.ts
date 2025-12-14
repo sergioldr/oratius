@@ -1,6 +1,9 @@
 import { config } from "@tamagui/config/v3";
 import { createFont, createTamagui } from "tamagui";
 
+// Primary color: rgb(59, 130, 246) = #3B82F6
+const PRIMARY_COLOR = "#3b82f6";
+
 const montserratFont = createFont({
   family: "Montserrat",
   size: {
@@ -67,6 +70,25 @@ const tamaguiConfig = createTamagui({
     ...config.fonts,
     heading: montserratFont,
     body: montserratFont,
+  },
+  tokens: {
+    ...config.tokens,
+    color: {
+      ...config.tokens.color,
+      // Primary color scale - rgb(59, 130, 246) = #3B82F6
+      primary1: "#eff6ff",
+      primary2: "#dbeafe",
+      primary3: "#bfdbfe",
+      primary4: "#93c5fd",
+      primary5: "#60a5fa",
+      primary6: "#3b82f6",
+      primary7: "#2563eb",
+      primary8: "#1d4ed8",
+      primary9: "#1e40af",
+      primary10: "#1e3a8a",
+      primary11: "#172554",
+      primary12: "#0f172a",
+    },
   },
 });
 
