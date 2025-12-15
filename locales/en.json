@@ -21,6 +21,20 @@
     "loginPrompt": "Already have an account?",
     "login": "Log in"
   },
+  "login": {
+    "title": "Welcome back",
+    "subtitle": "Sign in to access your AI coaching sessions and continue your progress.",
+    "continueWithApple": "Continue with Apple",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithEmail": "Continue with Email",
+    "emailPlaceholder": "Email address",
+    "magicLinkHint": "We'll send you a magic link. No password needed.",
+    "or": "or",
+    "termsPrefix": "By continuing, you agree to our",
+    "termsOfService": "Terms of Service",
+    "termsAnd": "&",
+    "privacyPolicy": "Privacy Policy"
+  },
   "home": {
     "greeting": {
       "morning": "Good morning,",

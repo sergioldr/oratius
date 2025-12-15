@@ -15,12 +15,11 @@ export default function WelcomeScreen() {
   const { t } = useTranslation();
 
   const handleGetStarted = () => {
-    router.push("/home");
+    router.push("/(auth)/home");
   };
 
   const handleLogin = () => {
-    // TODO: Implement login flow
-    console.log("Login pressed - to be implemented");
+    router.push("/login");
   };
 
   return (

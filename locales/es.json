@@ -21,6 +21,20 @@
     "loginPrompt": "¿Ya tienes una cuenta?",
     "login": "Iniciar sesión"
   },
+  "login": {
+    "title": "Bienvenido de nuevo",
+    "subtitle": "Inicia sesión para acceder a tus sesiones de coaching con IA y continuar tu progreso.",
+    "continueWithApple": "Continuar con Apple",
+    "continueWithGoogle": "Continuar con Google",
+    "continueWithEmail": "Continuar con Email",
+    "emailPlaceholder": "Correo electrónico",
+    "magicLinkHint": "Te enviaremos un enlace mágico. Sin contraseña.",
+    "or": "o",
+    "termsPrefix": "Al continuar, aceptas nuestros",
+    "termsOfService": "Términos de Servicio",
+    "termsAnd": "y",
+    "privacyPolicy": "Política de Privacidad"
+  },
   "home": {
     "greeting": {
       "morning": "Buenos días,",
