@@ -16,7 +16,7 @@ export function ScreenContainer({
 
   return (
     <LinearGradient
-      colors={["#1a1a2e", "#252545", "#2a3050"]}
+      colors={["#101322", "#101322", "#101322"]}
       style={styles.gradient}
     >
       <YStack

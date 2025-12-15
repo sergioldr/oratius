@@ -1,13 +1,12 @@
-import { MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Button, ScrollView, Sheet, Text, XStack, YStack } from "tamagui";
+import { ScrollView, Text, XStack, YStack } from "tamagui";
 
 import { Iridescence } from "@/components/iridescence";
 import { PulsingMicButton } from "@/components/pulsing-mic-button";
-import { ModeButton, StatCard } from "@/components/ui";
+import { ModeButton, Select, StatCard } from "@/components/ui";
 import { useUser } from "@/context/user-context";
 
 type Mode = "pitch" | "interview";
@@ -185,78 +184,13 @@ export default function HomeScreen() {
               >
                 {t("home.interviewType.title")}
               </Text>
-              <Button
-                height={44}
-                backgroundColor="$background"
-                borderWidth={1}
-                borderColor="$borderColor"
-                borderRadius="$4"
-                paddingHorizontal="$4"
-                justifyContent="space-between"
-                onPress={() => setSelectOpen(true)}
-              >
-                <Text
-                  fontSize="$3"
-                  color="$color"
-                  numberOfLines={1}
-                  flex={1}
-                  textAlign="left"
-                >
-                  {interviewOptions.find((o) => o.value === interviewType)
-                    ?.label || ""}
-                </Text>
-                <MaterialIcons
-                  name="keyboard-arrow-down"
-                  size={20}
-                  color="#9ca3af"
-                />
-              </Button>
-
-              <Sheet
-                modal
+              <Select
+                value={interviewType}
+                options={interviewOptions}
+                onValueChange={setInterviewType}
                 open={selectOpen}
                 onOpenChange={setSelectOpen}
-                snapPoints={[50]}
-                dismissOnSnapToBottom
-              >
-                <Sheet.Overlay />
-                <Sheet.Frame padding="$4" backgroundColor="$background">
-                  <Sheet.Handle />
-                  <YStack gap="$2" marginTop="$4">
-                    {interviewOptions.map((option) => (
-                      <Button
-                        key={option.value}
-                        height={48}
-                        backgroundColor={
-                          interviewType === option.value
-                            ? "$primary2"
-                            : "transparent"
-                        }
-                        borderRadius="$3"
-                        justifyContent="flex-start"
-                        onPress={() => {
-                          setInterviewType(option.value);
-                          setSelectOpen(false);
-                        }}
-                      >
-                        <Text
-                          fontSize="$4"
-                          color={
-                            interviewType === option.value
-                              ? "$primary6"
-                              : "$color"
-                          }
-                          fontWeight={
-                            interviewType === option.value ? "600" : "400"
-                          }
-                        >
-                          {option.label}
-                        </Text>
-                      </Button>
-                    ))}
-                  </YStack>
-                </Sheet.Frame>
-              </Sheet>
+              />
             </YStack>
           )}
         </YStack>

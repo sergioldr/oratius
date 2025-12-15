@@ -1,5 +1,7 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { Card, Text, XStack, YStack } from "tamagui";
+import { Text, XStack, YStack } from "tamagui";
+
+import { Card } from "./card";
 
 interface StatCardProps {
   icon: keyof typeof MaterialIcons.glyphMap;
@@ -17,14 +19,7 @@ export function StatCard({
   value,
 }: StatCardProps) {
   return (
-    <Card
-      flex={1}
-      padding="$3"
-      borderRadius="$6"
-      backgroundColor="$background"
-      borderWidth={1}
-      borderColor="$borderColor"
-    >
+    <Card flex={1}>
       <XStack alignItems="center" gap="$3">
         <YStack
           width={40}

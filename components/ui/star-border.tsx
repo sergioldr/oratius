@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   innerContent: {
     position: "relative",
     borderWidth: 1,
-    borderColor: "#1f2937",
+    borderColor: "rgba(55, 65, 81, 0.5)",
     overflow: "hidden",
     paddingVertical: 14,
     paddingHorizontal: 26,

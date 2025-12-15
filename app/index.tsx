@@ -1,11 +1,12 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Button, Text, XStack, YStack } from "tamagui";
+import { Text, XStack, YStack } from "tamagui";
 
 import {
   FeatureCard,
   GhostButton,
+  PrimaryButton,
   ThemedScreenContainer,
 } from "@/components/ui";
 import { VoiceOrb } from "@/components/voice-orb";
@@ -100,29 +101,18 @@ export default function WelcomeScreen() {
         {/* Bottom Section - CTA Buttons */}
         <YStack width="100%" paddingTop="$4" gap="$3">
           {/* Primary CTA Button */}
-          <Button
-            backgroundColor="$primary6"
-            color="white"
-            size="$5"
-            borderRadius="$10"
-            onPress={handleGetStarted}
-            shadowColor="$primary6"
-            shadowOffset={{ width: 0, height: 4 }}
-            shadowOpacity={0.25}
-            shadowRadius={8}
-            elevation={4}
-          >
+          <PrimaryButton onPress={handleGetStarted}>
             <XStack alignItems="center" gap="$2">
               <Text color="white" fontSize="$5" fontWeight="600">
                 {t("welcome.getStarted")}
               </Text>
               <MaterialIcons name="arrow-forward" size={20} color="white" />
             </XStack>
-          </Button>
+          </PrimaryButton>
 
           {/* Login Link */}
           <XStack justifyContent="center" alignItems="center" gap="$1">
-            <Text fontSize="$4" color="$gray11">
+            <Text fontSize="$4" color="$gray11" fontWeight="600">
               {t("welcome.loginPrompt")}
             </Text>
             <GhostButton onPress={handleLogin} size="$3" paddingHorizontal="$1">

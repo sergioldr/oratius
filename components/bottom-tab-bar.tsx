@@ -25,12 +25,12 @@ function TabItem({ icon, label, active = false, onPress }: TabItemProps) {
       <MaterialIcons
         name={icon}
         size={26}
-        color={active ? "#3b82f6" : "#9ca3af"}
+        color={active ? "#2547f4" : "#6b7280"}
       />
       <Text
         fontSize={10}
         fontWeight={active ? "600" : "500"}
-        color={active ? "$primary6" : "$gray10"}
+        color={active ? "$primary6" : "$color"}
       >
         {label}
       </Text>
@@ -72,7 +72,7 @@ export function BottomTabBar() {
       bottom={0}
       left={0}
       right={0}
-      backgroundColor="$background"
+      backgroundColor="$backgroundStrong"
       borderTopWidth={1}
       borderTopColor="$borderColor"
       paddingBottom={insets.bottom + 8}

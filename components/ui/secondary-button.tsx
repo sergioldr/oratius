@@ -1,22 +1,64 @@
-import { Button, type ButtonProps } from "tamagui";
+import { MaterialIcons } from "@expo/vector-icons";
+import { Button, type ButtonProps, Text, useTheme } from "tamagui";
 
-interface SecondaryButtonProps extends ButtonProps {
+type MaterialIconName = keyof typeof MaterialIcons.glyphMap;
+
+interface SecondaryButtonProps extends Omit<ButtonProps, "icon"> {
   children: React.ReactNode;
+  icon?: MaterialIconName;
+  iconPosition?: "left" | "right";
+  iconSize?: number;
 }
 
-export function SecondaryButton({ children, ...props }: SecondaryButtonProps) {
+export function SecondaryButton({
+  children,
+  icon,
+  iconPosition = "right",
+  iconSize = 20,
+  ...props
+}: SecondaryButtonProps) {
+  const theme = useTheme();
+  const iconColor = theme.color?.val || "#111218";
+
   return (
     <Button
-      backgroundColor="transparent"
-      borderWidth={0}
-      pressStyle={{ backgroundColor: "transparent", borderWidth: 0 }}
-      hoverStyle={{ backgroundColor: "transparent", borderWidth: 0 }}
-      focusStyle={{ backgroundColor: "transparent", borderWidth: 0 }}
-      color="$primary6"
-      size="$4"
+      backgroundColor="$buttonBackground"
+      borderWidth={1}
+      borderColor="$buttonBorderColor"
+      pressStyle={{
+        backgroundColor: "$buttonBackgroundPress",
+        borderColor: "$buttonBorderColor",
+      }}
+      hoverStyle={{
+        backgroundColor: "$buttonBackgroundHover",
+        borderColor: "$borderColorHover",
+      }}
+      focusStyle={{
+        backgroundColor: "$buttonBackground",
+        borderColor: "$buttonBorderColor",
+      }}
+      color="$color"
+      borderRadius="$4"
+      flexDirection={iconPosition === "left" ? "row" : "row"}
+      justifyContent={icon ? "space-between" : "center"}
       {...props}
     >
-      {children}
+      {icon && iconPosition === "left" && (
+        <MaterialIcons name={icon} size={iconSize} color={iconColor} />
+      )}
+      <Text
+        fontSize="$3"
+        fontWeight="500"
+        color="$color"
+        numberOfLines={1}
+        flex={icon ? 1 : undefined}
+        textAlign={icon ? "left" : "center"}
+      >
+        {children}
+      </Text>
+      {icon && iconPosition === "right" && (
+        <MaterialIcons name={icon} size={iconSize} color={iconColor} />
+      )}
     </Button>
   );
 }

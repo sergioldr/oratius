@@ -12,12 +12,21 @@ export function PrimaryButton({
   return (
     <Button
       backgroundColor={disabled ? "$gray8" : "$primary6"}
-      color="$white1"
+      color="white"
       size="$5"
-      borderRadius="$4"
-      pressStyle={{ opacity: 0.9, backgroundColor: "$primary6" }}
+      borderRadius="$10"
+      pressStyle={{
+        opacity: 0.9,
+        backgroundColor: "$primary6",
+        borderColor: "$primary6",
+      }}
       disabled={disabled}
       opacity={disabled ? 0.6 : 1}
+      shadowColor="$primary6"
+      shadowOffset={{ width: 0, height: 4 }}
+      shadowOpacity={0.25}
+      shadowRadius={8}
+      elevation={4}
       {...props}
     >
       {children}

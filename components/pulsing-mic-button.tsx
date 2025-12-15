@@ -63,7 +63,7 @@ export function PulsingMicButton({ onPress }: PulsingMicButtonProps) {
             width: baseSize,
             height: baseSize,
             borderRadius: baseSize / 2,
-            backgroundColor: "#3b82f6",
+            backgroundColor: "#2547f4",
           },
           pulseStyle,
         ]}
@@ -77,7 +77,7 @@ export function PulsingMicButton({ onPress }: PulsingMicButtonProps) {
             height: borderSize,
             borderRadius: borderSize / 2,
             borderWidth: 1,
-            borderColor: "rgba(59, 130, 246, 0.2)",
+            borderColor: "rgba(37, 71, 244, 0.2)",
           },
           pulseStyle,
         ]}

@@ -13,6 +13,7 @@ export function GhostButton({ children, ...props }: GhostButtonProps) {
       hoverStyle={{ backgroundColor: "transparent", borderWidth: 0 }}
       focusStyle={{ backgroundColor: "transparent", borderWidth: 0 }}
       color="$primary6"
+      fontWeight="600"
       size="$4"
       {...props}
     >
