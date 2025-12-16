@@ -11,7 +11,7 @@ export function PrimaryButton({
 }: PrimaryButtonProps) {
   return (
     <Button
-      backgroundColor={disabled ? "$gray8" : "$primary6"}
+      backgroundColor="$primary6"
       color="white"
       size="$5"
       borderRadius="$10"
@@ -21,7 +21,6 @@ export function PrimaryButton({
         borderColor: "$primary6",
       }}
       disabled={disabled}
-      opacity={disabled ? 0.6 : 1}
       shadowColor="$primary6"
       shadowOffset={{ width: 0, height: 4 }}
       shadowOpacity={0.25}

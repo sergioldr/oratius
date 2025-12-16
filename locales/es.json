@@ -27,13 +27,26 @@
     "continueWithApple": "Continuar con Apple",
     "continueWithGoogle": "Continuar con Google",
     "continueWithEmail": "Continuar con Email",
+    "resendMagicLink": "Reenviar Enlace Mágico",
     "emailPlaceholder": "Correo electrónico",
     "magicLinkHint": "Te enviaremos un enlace mágico. Sin contraseña.",
     "or": "o",
     "termsPrefix": "Al continuar, aceptas nuestros",
     "termsOfService": "Términos de Servicio",
     "termsAnd": "y",
-    "privacyPolicy": "Política de Privacidad"
+    "privacyPolicy": "Política de Privacidad",
+    "error": "Error de Inicio de Sesión",
+    "appleSignInError": "No se pudo iniciar sesión con Apple. Por favor, inténtalo de nuevo.",
+    "googleSignInError": "No se pudo iniciar sesión con Google. Por favor, inténtalo de nuevo.",
+    "magicLinkError": "No se pudo enviar el enlace mágico. Por favor, inténtalo de nuevo.",
+    "invalidEmail": "Por favor, introduce un correo electrónico válido.",
+    "magicLinkSentTitle": "Revisa Tu Correo",
+    "magicLinkSentBody": "Te hemos enviado un enlace mágico. Haz clic en el enlace para iniciar sesión."
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancelar",
+    "retry": "Reintentar"
   },
   "home": {
     "greeting": {

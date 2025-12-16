@@ -1,102 +1,22 @@
-import { FontAwesome, Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  Alert,
   Keyboard,
   Platform,
-  Pressable,
   TouchableWithoutFeedback,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, XStack, YStack } from "tamagui";
 
+import { AppleSignInButton, GoogleSignInButton } from "@/components/auth";
 import {
   PrimaryButton,
   TextInput,
   ThemedScreenContainer,
 } from "@/components/ui";
-
-/**
- * Sign in with Apple button following Apple Human Interface Guidelines
- * - Black background with white text (light mode)
- * - Apple logo on the left
- * - "Continue with Apple" text
- * https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple
- */
-function AppleSignInButton({ onPress }: { onPress: () => void }) {
-  const { t } = useTranslation();
-
-  return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => ({
-        opacity: pressed ? 0.8 : 1,
-      })}
-    >
-      <XStack
-        backgroundColor="#000000"
-        borderRadius={9999}
-        height={56}
-        paddingHorizontal={20}
-        alignItems="center"
-        justifyContent="center"
-        position="relative"
-      >
-        <XStack position="absolute" left={24}>
-          <Ionicons name="logo-apple" size={20} color="#FFFFFF" />
-        </XStack>
-        <Text
-          color="#FFFFFF"
-          fontSize={16}
-          fontWeight="600"
-          letterSpacing={0.3}
-        >
-          {t("login.continueWithApple")}
-        </Text>
-      </XStack>
-    </Pressable>
-  );
-}
-
-/**
- * Sign in with Google button following Google Branding Guidelines
- * - White/light gray background
- * - Google "G" logo on the left
- * - "Continue with Google" text
- * - Neutral gray text color
- * https://developers.google.com/identity/branding-guidelines
- */
-function GoogleSignInButton({ onPress }: { onPress: () => void }) {
-  const { t } = useTranslation();
-
-  return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => ({
-        opacity: pressed ? 0.8 : 1,
-      })}
-    >
-      <XStack
-        backgroundColor="$buttonBackground"
-        borderRadius={9999}
-        height={56}
-        paddingHorizontal={20}
-        alignItems="center"
-        justifyContent="center"
-        position="relative"
-        borderWidth={1}
-        borderColor="$borderColor"
-      >
-        <XStack position="absolute" left={24}>
-          <FontAwesome name="google" size={18} color="#4285F4" />
-        </XStack>
-        <Text color="$color" fontSize={16} fontWeight="600" letterSpacing={0.3}>
-          {t("login.continueWithGoogle")}
-        </Text>
-      </XStack>
-    </Pressable>
-  );
-}
+import { useAuth } from "@/context/auth-context";
 
 /**
  * Divider component with "or" text
@@ -128,26 +48,85 @@ function OrDivider() {
 /**
  * Login Screen Component
  * Provides authentication options: Apple Sign In, Google Sign In, and Magic Link email
+ *
+ * Uses Supabase Auth with:
+ * - Native Apple Sign In (expo-apple-authentication)
+ * - Native Google Sign In (@react-native-google-signin/google-signin)
+ * - Magic Link email authentication
  */
 export default function LoginScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const { signInWithApple, signInWithGoogle, signInWithMagicLink, session } =
+    useAuth();
+
   const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [magicLinkSent, setMagicLinkSent] = useState(false);
 
-  const handleAppleSignIn = () => {
-    // TODO: Implement Apple Sign In using expo-apple-authentication
-    console.log("Apple Sign In pressed");
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (session) {
+      router.replace("/(auth)/home");
+    }
+  }, [session]);
+
+  const handleAppleSignIn = async () => {
+    try {
+      setIsLoading(true);
+      await signInWithApple();
+    } catch (error) {
+      console.error("Apple Sign-In failed:", error);
+      Alert.alert(t("login.error"), t("login.appleSignInError"), [
+        { text: t("common.ok") },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleGoogleSignIn = () => {
-    // TODO: Implement Google Sign In using expo-auth-session
-    console.log("Google Sign In pressed");
+  const handleGoogleSignIn = async () => {
+    try {
+      setIsLoading(true);
+      await signInWithGoogle();
+    } catch (error) {
+      console.error("Google Sign-In failed:", error);
+      Alert.alert(t("login.error"), t("login.googleSignInError"), [
+        { text: t("common.ok") },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleEmailContinue = () => {
-    if (!email.trim()) return;
-    // TODO: Implement magic link email authentication
-    console.log("Continue with email:", email);
+  const handleEmailContinue = async () => {
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) return;
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      Alert.alert(t("login.error"), t("login.invalidEmail"), [
+        { text: t("common.ok") },
+      ]);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      await signInWithMagicLink(trimmedEmail);
+      setMagicLinkSent(true);
+      Alert.alert(t("login.magicLinkSentTitle"), t("login.magicLinkSentBody"), [
+        { text: t("common.ok") },
+      ]);
+    } catch (error) {
+      console.error("Magic Link failed:", error);
+      Alert.alert(t("login.error"), t("login.magicLinkError"), [
+        { text: t("common.ok") },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleTermsPress = () => {
@@ -202,18 +181,17 @@ export default function LoginScreen() {
 
           {/* Auth Buttons Section */}
           <YStack width="100%" gap={16} marginBottom={24}>
-            {/* Apple Sign In - Only show on iOS or if user might use Apple ID */}
-            {Platform.OS === "ios" ? (
-              <AppleSignInButton onPress={handleAppleSignIn} />
-            ) : null}
+            {/* Apple Sign In */}
+            <AppleSignInButton
+              onPress={handleAppleSignIn}
+              disabled={isLoading}
+            />
 
             {/* Google Sign In */}
-            <GoogleSignInButton onPress={handleGoogleSignIn} />
-
-            {/* Apple Sign In for Android/Web users who have Apple ID */}
-            {Platform.OS !== "ios" ? (
-              <AppleSignInButton onPress={handleAppleSignIn} />
-            ) : null}
+            <GoogleSignInButton
+              onPress={handleGoogleSignIn}
+              disabled={isLoading}
+            />
 
             {/* Divider */}
             <OrDivider />
@@ -228,16 +206,22 @@ export default function LoginScreen() {
                 autoCapitalize="none"
                 autoCorrect={false}
                 autoComplete="email"
+                editable={!isLoading}
               />
 
-              <PrimaryButton onPress={handleEmailContinue}>
+              <PrimaryButton
+                onPress={handleEmailContinue}
+                disabled={isLoading || !email.trim()}
+              >
                 <Text
                   color="white"
                   fontSize={16}
                   fontWeight="700"
                   letterSpacing={0.3}
                 >
-                  {t("login.continueWithEmail")}
+                  {magicLinkSent
+                    ? t("login.resendMagicLink")
+                    : t("login.continueWithEmail")}
                 </Text>
               </PrimaryButton>
 

@@ -43,11 +43,6 @@ export function BottomTabBar() {
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
 
-  // Don't render on welcome/index screen
-  if (pathname === "/" || pathname === "/index") {
-    return null;
-  }
-
   const tabs = [
     {
       icon: "show-chart" as const,

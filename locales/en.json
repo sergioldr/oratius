@@ -27,13 +27,26 @@
     "continueWithApple": "Continue with Apple",
     "continueWithGoogle": "Continue with Google",
     "continueWithEmail": "Continue with Email",
+    "resendMagicLink": "Resend Magic Link",
     "emailPlaceholder": "Email address",
     "magicLinkHint": "We'll send you a magic link. No password needed.",
     "or": "or",
     "termsPrefix": "By continuing, you agree to our",
     "termsOfService": "Terms of Service",
     "termsAnd": "&",
-    "privacyPolicy": "Privacy Policy"
+    "privacyPolicy": "Privacy Policy",
+    "error": "Sign In Error",
+    "appleSignInError": "Unable to sign in with Apple. Please try again.",
+    "googleSignInError": "Unable to sign in with Google. Please try again.",
+    "magicLinkError": "Unable to send magic link. Please try again.",
+    "invalidEmail": "Please enter a valid email address.",
+    "magicLinkSentTitle": "Check Your Email",
+    "magicLinkSentBody": "We've sent a magic link to your email. Click the link to sign in."
+  },
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "retry": "Retry"
   },
   "home": {
     "greeting": {

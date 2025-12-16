@@ -5,6 +5,7 @@ import {
   Montserrat_700Bold,
   useFonts,
 } from "@expo-google-fonts/montserrat";
+import { Roboto_500Medium } from "@expo-google-fonts/roboto";
 import {
   DarkTheme,
   DefaultTheme,
@@ -17,6 +18,7 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 import { TamaguiProvider, Theme } from "tamagui";
 
+import { AuthProvider } from "@/context/auth-context";
 import { UserProvider } from "@/context/user-context";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import "@/locales";
@@ -32,6 +34,7 @@ export default function RootLayout() {
     Montserrat_500Medium,
     Montserrat_600SemiBold,
     Montserrat_700Bold,
+    Roboto_500Medium,
   });
 
   useEffect(() => {
@@ -50,23 +53,25 @@ export default function RootLayout() {
         <ThemeProvider
           value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
-          <UserProvider>
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="index" options={{ title: "" }} />
-              <Stack.Screen
-                name="login"
-                options={{
-                  headerShown: true,
-                  headerTransparent: true,
-                  headerTitle: "",
-                  headerBackTitle: "",
-                  headerBackButtonDisplayMode: "minimal",
-                }}
-              />
-              <Stack.Screen name="(auth)" />
-            </Stack>
-            <StatusBar style="auto" />
-          </UserProvider>
+          <AuthProvider>
+            <UserProvider>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="index" options={{ title: "" }} />
+                <Stack.Screen
+                  name="login"
+                  options={{
+                    headerShown: true,
+                    headerTransparent: true,
+                    headerTitle: "",
+                    headerBackTitle: "",
+                    headerBackButtonDisplayMode: "minimal",
+                  }}
+                />
+                <Stack.Screen name="(auth)" />
+              </Stack>
+              <StatusBar style="auto" />
+            </UserProvider>
+          </AuthProvider>
         </ThemeProvider>
       </Theme>
     </TamaguiProvider>
