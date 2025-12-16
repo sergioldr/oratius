@@ -39,7 +39,7 @@ const ExpoSecureStoreAdapter = {
 // Get these from your Supabase project settings
 // Settings -> API -> Project URL and Project API keys (anon/public)
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_KEY;
 
 /**
  * Create Supabase client with proper error handling
@@ -50,7 +50,7 @@ function createSupabaseClient(): SupabaseClient {
     console.warn(
       "⚠️ Supabase environment variables not set. Please create a .env file with:\n" +
         "EXPO_PUBLIC_SUPABASE_URL=your-supabase-url\n" +
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key"
+        "EXPO_PUBLIC_SUPABASE_KEY=your-supabase-anon-key"
     );
     // Return a client with placeholder values - it won't work but won't crash
     return createClient("https://placeholder.supabase.co", "placeholder-key", {

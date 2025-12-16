@@ -1,6 +1,8 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { Redirect, router } from "expo-router";
+import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { ActivityIndicator } from "react-native";
 import { Text, XStack, YStack } from "tamagui";
 
 import {
@@ -10,13 +12,32 @@ import {
   ThemedScreenContainer,
 } from "@/components/ui";
 import { VoiceOrb } from "@/components/voice-orb";
+import { useAuth } from "@/context/auth-context";
 
 export default function WelcomeScreen() {
   const { t } = useTranslation();
+  const { session, isLoading, signInAnonymously } = useAuth();
+  const [isSigningIn, setIsSigningIn] = useState(false);
 
-  const handleGetStarted = () => {
-    router.push("/(auth)/home");
-  };
+  const handleGetStarted = useCallback(async () => {
+    if (isSigningIn) return;
+
+    setIsSigningIn(true);
+    try {
+      await signInAnonymously();
+      router.replace("/(auth)/home");
+    } catch (error) {
+      console.error("Failed to sign in anonymously:", error);
+      // TODO: Show error toast/alert to user
+    } finally {
+      setIsSigningIn(false);
+    }
+  }, [isSigningIn, signInAnonymously]);
+
+  // Redirect to home if user already has a session
+  if (!isLoading && session) {
+    return <Redirect href="/(auth)/home" />;
+  }
 
   const handleLogin = () => {
     router.push("/login");
@@ -100,12 +121,21 @@ export default function WelcomeScreen() {
         {/* Bottom Section - CTA Buttons */}
         <YStack width="100%" paddingTop="$4" gap="$3">
           {/* Primary CTA Button */}
-          <PrimaryButton onPress={handleGetStarted}>
+          <PrimaryButton
+            onPress={handleGetStarted}
+            disabled={isSigningIn || isLoading}
+          >
             <XStack alignItems="center" gap="$2">
-              <Text color="white" fontSize="$5" fontWeight="600">
-                {t("welcome.getStarted")}
-              </Text>
-              <MaterialIcons name="arrow-forward" size={20} color="white" />
+              {isSigningIn ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <>
+                  <Text color="white" fontSize="$5" fontWeight="600">
+                    {t("welcome.getStarted")}
+                  </Text>
+                  <MaterialIcons name="arrow-forward" size={20} color="white" />
+                </>
+              )}
             </XStack>
           </PrimaryButton>
 

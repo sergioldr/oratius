@@ -38,6 +38,8 @@ interface AuthContextType {
   session: Session | null;
   user: User | null;
   isLoading: boolean;
+  isAnonymous: boolean;
+  signInAnonymously: () => Promise<void>;
   signInWithApple: () => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signInWithMagicLink: (email: string) => Promise<void>;
@@ -145,6 +147,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
       console.error("Apple Sign-In error:", error);
+      throw error;
+    }
+  }, []);
+
+  /**
+   * Sign in anonymously
+   * Creates a temporary anonymous user that can later be linked to a permanent account.
+   */
+  const signInAnonymously = useCallback(async () => {
+    try {
+      const { error } = await supabase.auth.signInAnonymously();
+
+      if (error) {
+        throw error;
+      }
+    } catch (error) {
+      console.error("Anonymous Sign-In error:", error);
       throw error;
     }
   }, []);
@@ -264,12 +283,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Check if the current user is anonymous
+  const isAnonymous = user?.is_anonymous ?? false;
+
   return (
     <AuthContext.Provider
       value={{
         session,
         user,
         isLoading,
+        isAnonymous,
+        signInAnonymously,
         signInWithApple,
         signInWithGoogle,
         signInWithMagicLink,
