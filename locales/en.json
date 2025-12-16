@@ -21,6 +21,10 @@
     "loginPrompt": "Already have an account?",
     "login": "Log in"
   },
+  "signup": {
+    "title": "Save your progress",
+    "subtitle": "Create an account to keep your coaching sessions and track your improvement over time."
+  },
   "login": {
     "title": "Welcome back",
     "subtitle": "Sign in to access your AI coaching sessions and continue your progress.",
@@ -89,6 +93,110 @@
       "feedback": "Feedback",
       "practice": "Practice",
       "profile": "Profile"
+    }
+  },
+  "profile": {
+    "headerSubtitle": "Guest session • Changes are temporary",
+    "guestUser": "Guest User",
+    "unregisteredSession": "Unregistered session",
+    "guest": "Guest",
+    "freeTier": "Free Tier",
+    "createFreeAccount": "Create free account",
+    "logIn": "Log In",
+    "aboutYou": {
+      "title": "About you",
+      "description": "This helps the AI adapt feedback.",
+      "registerCta": "Register to save this context."
+    },
+    "currentRole": {
+      "title": "Current role",
+      "ceo": "CEO",
+      "executive": "Executive / Director",
+      "manager": "Manager",
+      "individual": "Individual Contributor"
+    },
+    "speakingContext": {
+      "title": "Primary speaking context",
+      "executiveMeetings": "Executive meetings",
+      "interviews": "Interviews",
+      "pitches": "Pitches",
+      "dailyTeam": "Daily team"
+    },
+    "industry": {
+      "title": "Industry",
+      "placeholder": "Select industry",
+      "technology": "Technology",
+      "finance": "Finance",
+      "consulting": "Consulting",
+      "healthcare": "Healthcare",
+      "other": "Other"
+    },
+    "seniority": {
+      "title": "Seniority",
+      "placeholder": "Select seniority",
+      "senior": "Senior",
+      "midLevel": "Mid-level",
+      "emerging": "Emerging"
+    },
+    "communication": {
+      "title": "How you communicate",
+      "description": "Sign up to track your communication patterns over time.",
+      "styleTitle": "Preferred communication style",
+      "direct": "Direct",
+      "strategic": "Strategic",
+      "inspirational": "Inspirational",
+      "analytical": "Analytical"
+    },
+    "language": {
+      "title": "Primary language",
+      "placeholder": "Select language",
+      "enUs": "English (US)",
+      "enUk": "English (UK)",
+      "es": "Spanish",
+      "fr": "French"
+    },
+    "goals": {
+      "title": "What matters most right now",
+      "description": "We'll prioritize this in your feedback.",
+      "signUpCta": "Sign up to save progress.",
+      "soundConfident": "Sound more confident",
+      "beConcise": "Be more concise",
+      "executivePresence": "Improve executive presence",
+      "toughQuestions": "Handle tough questions"
+    },
+    "settings": {
+      "title": "Settings",
+      "notifications": "Notifications",
+      "audioPermissions": "Audio Permissions",
+      "resetOnboarding": "Reset onboarding",
+      "dataPrivacy": "Data & Privacy"
+    },
+    "actions": {
+      "saveSettings": "Save temporary settings",
+      "signOut": "Sign Out",
+      "deleteAccount": "Delete Account"
+    },
+    "alerts": {
+      "signOut": {
+        "title": "Sign Out",
+        "message": "All your temporary data will be lost, including all analyzed audios. Are you sure you want to sign out?",
+        "confirm": "Sign Out"
+      },
+      "deleteAccount": {
+        "title": "Delete Account",
+        "message": "This action is permanent and cannot be undone. All your data will be permanently deleted, including all analyzed audios. Are you sure?",
+        "confirm": "Delete Account"
+      },
+      "finalConfirmation": {
+        "title": "Final Confirmation",
+        "message": "This is your last chance. Your account and all associated data will be permanently deleted.",
+        "confirm": "Delete Permanently"
+      },
+      "error": {
+        "title": "Error",
+        "signOutFailed": "Failed to sign out. Please try again.",
+        "deleteAccountFailed": "Failed to delete account. Please try again or contact support."
+      }
     }
   }
 }

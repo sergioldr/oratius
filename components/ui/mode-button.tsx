@@ -1,39 +1,69 @@
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Button, Text } from "tamagui";
+
+type ModeButtonVariant = "default" | "outlined";
 
 interface ModeButtonProps {
   label: string;
   selected: boolean;
   onPress: () => void;
+  variant?: ModeButtonVariant;
 }
 
-export function ModeButton({ label, selected, onPress }: ModeButtonProps) {
+export function ModeButton({
+  label,
+  selected,
+  onPress,
+  variant = "default",
+}: ModeButtonProps) {
+  const isOutlined = variant === "outlined";
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+
+  const getBackgroundColor = () => {
+    if (isOutlined) {
+      return selected
+        ? isDark
+          ? "$primary11"
+          : "$gray3"
+        : "$buttonBackground";
+    }
+    return selected ? "$primary6" : "$buttonBackground";
+  };
+
+  const getBorderColor = () => {
+    if (isOutlined && selected) {
+      return isDark ? "$primary10" : "$gray4";
+    }
+    return selected ? "$primary6" : "$buttonBorderColor";
+  };
+
+  const getTextColor = () => {
+    return selected && variant === "default" ? "white" : "$color";
+  };
+
   return (
     <Button
       unstyled
       height={40}
       paddingHorizontal="$4"
       borderRadius="$10"
-      backgroundColor={selected ? "$primary6" : "$buttonBackground"}
-      borderWidth={selected ? 0 : 1}
-      borderColor="$buttonBorderColor"
+      backgroundColor={getBackgroundColor()}
+      borderWidth={1}
+      borderColor={getBorderColor()}
       pressStyle={{
         scale: 0.98,
-        backgroundColor: selected ? "$primary6" : "$buttonBackgroundPress",
+        backgroundColor: isOutlined
+          ? "$buttonBackgroundPress"
+          : selected
+          ? "$primary6"
+          : "$buttonBackgroundPress",
       }}
       onPress={onPress}
-      shadowColor={selected ? "$primary6" : "transparent"}
-      shadowOffset={{ width: 0, height: 4 }}
-      shadowOpacity={selected ? 0.3 : 0}
-      shadowRadius={8}
-      elevation={selected ? 4 : 0}
       alignItems="center"
       justifyContent="center"
     >
-      <Text
-        fontSize="$3"
-        fontWeight="500"
-        color={selected ? "white" : "$color"}
-      >
+      <Text fontSize="$3" fontWeight="500" color={getTextColor()}>
         {label}
       </Text>
     </Button>

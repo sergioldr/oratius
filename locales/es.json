@@ -21,6 +21,10 @@
     "loginPrompt": "¿Ya tienes una cuenta?",
     "login": "Iniciar sesión"
   },
+  "signup": {
+    "title": "Guarda tu progreso",
+    "subtitle": "Crea una cuenta para mantener tus sesiones de coaching y seguir tu mejora con el tiempo."
+  },
   "login": {
     "title": "Bienvenido de nuevo",
     "subtitle": "Inicia sesión para acceder a tus sesiones de coaching con IA y continuar tu progreso.",
@@ -89,6 +93,110 @@
       "feedback": "Feedback",
       "practice": "Práctica",
       "profile": "Perfil"
+    }
+  },
+  "profile": {
+    "headerSubtitle": "Sesión de invitado • Los cambios son temporales",
+    "guestUser": "Usuario Invitado",
+    "unregisteredSession": "Sesión no registrada",
+    "guest": "Invitado",
+    "freeTier": "Plan Gratuito",
+    "createFreeAccount": "Crear cuenta gratis",
+    "logIn": "Iniciar Sesión",
+    "aboutYou": {
+      "title": "Sobre ti",
+      "description": "Esto ayuda a la IA a adaptar la retroalimentación.",
+      "registerCta": "Regístrate para guardar este contexto."
+    },
+    "currentRole": {
+      "title": "Rol actual",
+      "ceo": "CEO",
+      "executive": "Ejecutivo / Director",
+      "manager": "Gerente",
+      "individual": "Colaborador Individual"
+    },
+    "speakingContext": {
+      "title": "Contexto principal de habla",
+      "executiveMeetings": "Reuniones ejecutivas",
+      "interviews": "Entrevistas",
+      "pitches": "Presentaciones",
+      "dailyTeam": "Equipo diario"
+    },
+    "industry": {
+      "title": "Industria",
+      "placeholder": "Seleccionar industria",
+      "technology": "Tecnología",
+      "finance": "Finanzas",
+      "consulting": "Consultoría",
+      "healthcare": "Salud",
+      "other": "Otro"
+    },
+    "seniority": {
+      "title": "Antigüedad",
+      "placeholder": "Seleccionar antigüedad",
+      "senior": "Senior",
+      "midLevel": "Nivel medio",
+      "emerging": "Emergente"
+    },
+    "communication": {
+      "title": "Cómo te comunicas",
+      "description": "Regístrate para rastrear tus patrones de comunicación a lo largo del tiempo.",
+      "styleTitle": "Estilo de comunicación preferido",
+      "direct": "Directo",
+      "strategic": "Estratégico",
+      "inspirational": "Inspirador",
+      "analytical": "Analítico"
+    },
+    "language": {
+      "title": "Idioma principal",
+      "placeholder": "Seleccionar idioma",
+      "enUs": "Inglés (US)",
+      "enUk": "Inglés (UK)",
+      "es": "Español",
+      "fr": "Francés"
+    },
+    "goals": {
+      "title": "Lo que más importa ahora",
+      "description": "Priorizaremos esto en tu retroalimentación.",
+      "signUpCta": "Regístrate para guardar tu progreso.",
+      "soundConfident": "Sonar más seguro",
+      "beConcise": "Ser más conciso",
+      "executivePresence": "Mejorar presencia ejecutiva",
+      "toughQuestions": "Manejar preguntas difíciles"
+    },
+    "settings": {
+      "title": "Configuración",
+      "notifications": "Notificaciones",
+      "audioPermissions": "Permisos de Audio",
+      "resetOnboarding": "Reiniciar tutorial",
+      "dataPrivacy": "Datos y Privacidad"
+    },
+    "actions": {
+      "saveSettings": "Guardar configuración temporal",
+      "signOut": "Cerrar Sesión",
+      "deleteAccount": "Eliminar Cuenta"
+    },
+    "alerts": {
+      "signOut": {
+        "title": "Cerrar Sesión",
+        "message": "Todos tus datos temporales se perderán, incluyendo todos los audios analizados. ¿Estás seguro de que quieres cerrar sesión?",
+        "confirm": "Cerrar Sesión"
+      },
+      "deleteAccount": {
+        "title": "Eliminar Cuenta",
+        "message": "Esta acción es permanente y no se puede deshacer. Todos tus datos serán eliminados permanentemente, incluyendo todos los audios analizados. ¿Estás seguro?",
+        "confirm": "Eliminar Cuenta"
+      },
+      "finalConfirmation": {
+        "title": "Confirmación Final",
+        "message": "Esta es tu última oportunidad. Tu cuenta y todos los datos asociados serán eliminados permanentemente.",
+        "confirm": "Eliminar Permanentemente"
+      },
+      "error": {
+        "title": "Error",
+        "signOutFailed": "No se pudo cerrar sesión. Por favor, inténtalo de nuevo.",
+        "deleteAccountFailed": "No se pudo eliminar la cuenta. Por favor, inténtalo de nuevo o contacta soporte."
+      }
     }
   }
 }

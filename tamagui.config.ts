@@ -143,6 +143,9 @@ const tamaguiConfig = createTamagui({
       buttonBorderColor: BORDER_DARK,
       buttonBackgroundHover: BUTTON_BACKGROUND_DARK,
       buttonBackgroundPress: BUTTON_BACKGROUND_DARK,
+      // Switch colors
+      switchBackground: BORDER_DARK,
+      switchBorderColor: BORDER_DARK,
     },
     light: {
       ...config.themes.light,
@@ -166,6 +169,9 @@ const tamaguiConfig = createTamagui({
       buttonBorderColor: BORDER_LIGHT,
       buttonBackgroundHover: BUTTON_BACKGROUND_LIGHT_HOVER,
       buttonBackgroundPress: BUTTON_BACKGROUND_LIGHT,
+      // Switch colors
+      switchBackground: BORDER_LIGHT,
+      switchBorderColor: BORDER_LIGHT,
     },
   },
 });

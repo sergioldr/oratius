@@ -3,8 +3,8 @@ import { Button, type ButtonProps, Text, useTheme } from "tamagui";
 
 type MaterialIconName = keyof typeof MaterialIcons.glyphMap;
 
-interface SecondaryButtonProps extends Omit<ButtonProps, "icon"> {
-  children: React.ReactNode;
+interface SecondaryButtonProps extends Omit<ButtonProps, "icon" | "children"> {
+  children: string;
   icon?: MaterialIconName;
   iconPosition?: "left" | "right";
   iconSize?: number;
@@ -39,6 +39,7 @@ export function SecondaryButton({
       }}
       color="$color"
       borderRadius="$4"
+      paddingHorizontal="$5"
       flexDirection={iconPosition === "left" ? "row" : "row"}
       justifyContent={icon ? "space-between" : "center"}
       {...props}
@@ -47,7 +48,7 @@ export function SecondaryButton({
         <MaterialIcons name={icon} size={iconSize} color={iconColor} />
       )}
       <Text
-        fontSize="$3"
+        fontSize="$2"
         fontWeight="500"
         color="$color"
         numberOfLines={1}

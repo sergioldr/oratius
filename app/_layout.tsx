@@ -6,15 +6,17 @@ import {
   useFonts,
 } from "@expo-google-fonts/montserrat";
 import { Roboto_500Medium } from "@expo-google-fonts/roboto";
+import { MaterialIcons } from "@expo/vector-icons";
 import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
-import { Stack } from "expo-router";
+import { router, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
+import { Pressable } from "react-native";
 import "react-native-reanimated";
 import { TamaguiProvider, Theme } from "tamagui";
 
@@ -39,7 +41,10 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (fontsLoaded) {
-      SplashScreen.hideAsync();
+      SplashScreen.hideAsync().catch(() => {
+        // Ignore error if splash screen is not registered for the view controller
+        // This can happen with modal presentations on iOS
+      });
     }
   }, [fontsLoaded]);
 
@@ -65,6 +70,25 @@ export default function RootLayout() {
                     headerTitle: "",
                     headerBackTitle: "",
                     headerBackButtonDisplayMode: "minimal",
+                  }}
+                />
+                <Stack.Screen
+                  name="signup"
+                  options={{
+                    presentation: "modal",
+                    headerShown: true,
+                    headerTitle: "",
+                    headerTransparent: true,
+                    headerRight: () => (
+                      <Pressable onPress={() => router.back()} hitSlop={10}>
+                        <MaterialIcons
+                          name="close"
+                          size={28}
+                          color="white"
+                          style={{ opacity: 0.8, paddingLeft: 4.5 }}
+                        />
+                      </Pressable>
+                    ),
                   }}
                 />
                 <Stack.Screen name="(auth)" />

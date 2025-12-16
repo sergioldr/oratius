@@ -1,5 +1,42 @@
-import { Sheet, Text, YStack } from "tamagui";
+import { Button, Sheet, styled, YStack } from "tamagui";
 import { SecondaryButton } from "./secondary-button";
+
+const SelectOptionButton = styled(Button, {
+  height: 48,
+  borderWidth: 0,
+  justifyContent: "flex-start",
+  borderRadius: "$4",
+  paddingHorizontal: "$4",
+
+  variants: {
+    selected: {
+      true: {
+        backgroundColor: "$primary6",
+        color: "white",
+        pressStyle: {
+          backgroundColor: "$primary6",
+        },
+        hoverStyle: {
+          backgroundColor: "$primary6",
+        },
+      },
+      false: {
+        backgroundColor: "transparent",
+        color: "$color",
+        pressStyle: {
+          backgroundColor: "transparent",
+        },
+        hoverStyle: {
+          backgroundColor: "transparent",
+        },
+      },
+    },
+  } as const,
+
+  defaultVariants: {
+    selected: false,
+  },
+});
 
 interface SelectOption<T extends string> {
   value: T;
@@ -51,27 +88,16 @@ export function Select<T extends string>({
           <Sheet.Handle />
           <YStack gap="$2" marginTop="$4">
             {options.map((option) => (
-              <SecondaryButton
+              <SelectOptionButton
                 key={option.value}
-                height={48}
-                backgroundColor={
-                  value === option.value ? "$primary6" : "transparent"
-                }
-                borderWidth={0}
-                justifyContent="flex-start"
+                selected={value === option.value}
                 onPress={() => {
                   onValueChange(option.value);
                   onOpenChange(false);
                 }}
               >
-                <Text
-                  fontSize="$3"
-                  fontWeight="500"
-                  color={value === option.value ? "white" : "$color"}
-                >
-                  {option.label}
-                </Text>
-              </SecondaryButton>
+                {option.label}
+              </SelectOptionButton>
             ))}
           </YStack>
         </Sheet.Frame>

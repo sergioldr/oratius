@@ -1,8 +1,6 @@
-import { MaterialIcons } from "@expo/vector-icons";
 import { Redirect, router } from "expo-router";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator } from "react-native";
 import { Text, XStack, YStack } from "tamagui";
 
 import {
@@ -123,20 +121,10 @@ export default function WelcomeScreen() {
           {/* Primary CTA Button */}
           <PrimaryButton
             onPress={handleGetStarted}
-            disabled={isSigningIn || isLoading}
+            isLoading={isSigningIn || isLoading}
+            iconRight="arrow-forward"
           >
-            <XStack alignItems="center" gap="$2">
-              {isSigningIn ? (
-                <ActivityIndicator size="small" color="white" />
-              ) : (
-                <>
-                  <Text color="white" fontSize="$5" fontWeight="600">
-                    {t("welcome.getStarted")}
-                  </Text>
-                  <MaterialIcons name="arrow-forward" size={20} color="white" />
-                </>
-              )}
-            </XStack>
+            {t("welcome.getStarted")}
           </PrimaryButton>
 
           {/* Login Link */}

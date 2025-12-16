@@ -1,11 +1,17 @@
-import { Button, type ButtonProps } from "tamagui";
+import { MaterialIcons } from "@expo/vector-icons";
+import { ActivityIndicator } from "react-native";
+import { Button, type ButtonProps, Text, XStack } from "tamagui";
 
-interface PrimaryButtonProps extends ButtonProps {
-  children: React.ReactNode;
+interface PrimaryButtonProps extends Omit<ButtonProps, "children" | "icon"> {
+  children: string;
+  iconRight?: keyof typeof MaterialIcons.glyphMap;
+  isLoading?: boolean;
 }
 
 export function PrimaryButton({
   children,
+  iconRight,
+  isLoading,
   disabled,
   ...props
 }: PrimaryButtonProps) {
@@ -20,7 +26,7 @@ export function PrimaryButton({
         backgroundColor: "$primary6",
         borderColor: "$primary6",
       }}
-      disabled={disabled}
+      disabled={disabled || isLoading}
       shadowColor="$primary6"
       shadowOffset={{ width: 0, height: 4 }}
       shadowOpacity={0.25}
@@ -28,7 +34,20 @@ export function PrimaryButton({
       elevation={4}
       {...props}
     >
-      {children}
+      <XStack alignItems="center" gap="$2">
+        {isLoading ? (
+          <ActivityIndicator size="small" color="white" />
+        ) : (
+          <>
+            <Text color="white" fontSize="$5" fontWeight="600">
+              {children}
+            </Text>
+            {iconRight && (
+              <MaterialIcons name={iconRight} size={20} color="white" />
+            )}
+          </>
+        )}
+      </XStack>
     </Button>
   );
 }

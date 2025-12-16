@@ -1,10 +1,17 @@
 import { Button, type ButtonProps } from "tamagui";
 
-interface GhostButtonProps extends ButtonProps {
+type GhostButtonVariant = "default" | "danger";
+
+interface GhostButtonProps extends Omit<ButtonProps, "variant"> {
   children: React.ReactNode;
+  variant?: GhostButtonVariant;
 }
 
-export function GhostButton({ children, ...props }: GhostButtonProps) {
+export function GhostButton({
+  children,
+  variant = "default",
+  ...props
+}: GhostButtonProps) {
   return (
     <Button
       backgroundColor="transparent"
@@ -12,7 +19,7 @@ export function GhostButton({ children, ...props }: GhostButtonProps) {
       pressStyle={{ backgroundColor: "transparent", borderWidth: 0 }}
       hoverStyle={{ backgroundColor: "transparent", borderWidth: 0 }}
       focusStyle={{ backgroundColor: "transparent", borderWidth: 0 }}
-      color="$primary6"
+      color={variant === "danger" ? "$red10" : "$primary6"}
       fontWeight="600"
       size="$4"
       {...props}

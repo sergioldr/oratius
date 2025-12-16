@@ -46,30 +46,37 @@ function OrDivider() {
 }
 
 /**
- * Login Screen Component
- * Provides authentication options: Apple Sign In, Google Sign In, and Magic Link email
+ * Signup Screen Component (Modal)
+ * Prompts users to save their progress by creating an account.
+ * Used from the profile screen for guest users.
  *
  * Uses Supabase Auth with:
  * - Native Apple Sign In (expo-apple-authentication)
  * - Native Google Sign In (@react-native-google-signin/google-signin)
  * - Magic Link email authentication
  */
-export default function LoginScreen() {
+export default function SignupScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
-  const { signInWithApple, signInWithGoogle, signInWithMagicLink, session } =
-    useAuth();
+  const {
+    signInWithApple,
+    signInWithGoogle,
+    signInWithMagicLink,
+    session,
+    isAnonymous,
+  } = useAuth();
 
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
 
-  // Redirect if already authenticated
+  // Redirect only if user has a real (non-anonymous) account
+  // Anonymous users should stay to upgrade their session
   useEffect(() => {
-    if (session) {
-      router.replace("/(auth)/home");
+    if (session && !isAnonymous) {
+      router.back();
     }
-  }, [session]);
+  }, [session, isAnonymous]);
 
   const handleAppleSignIn = async () => {
     try {
@@ -150,7 +157,7 @@ export default function LoginScreen() {
           flex={1}
           alignItems="center"
           justifyContent="flex-start"
-          paddingTop={Platform.OS === "ios" ? insets.top + 56 : insets.top + 8}
+          paddingTop={Platform.OS === "ios" ? 24 : insets.top + 8}
           paddingBottom="$4"
           width="100%"
           maxWidth={448}
@@ -166,7 +173,7 @@ export default function LoginScreen() {
               paddingBottom={12}
               letterSpacing={-0.5}
             >
-              {t("login.title")}
+              {t("signup.title")}
             </Text>
             <Text
               fontSize={16}
@@ -175,7 +182,7 @@ export default function LoginScreen() {
               lineHeight={24}
               maxWidth={320}
             >
-              {t("login.subtitle")}
+              {t("signup.subtitle")}
             </Text>
           </YStack>
 
