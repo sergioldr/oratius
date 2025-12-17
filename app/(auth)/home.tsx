@@ -1,3 +1,4 @@
+import { Href, router } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
@@ -8,6 +9,7 @@ import { Iridescence } from "@/components/iridescence";
 import { PulsingMicButton } from "@/components/pulsing-mic-button";
 import { ModeButton, Select, StatCard } from "@/components/ui";
 import { useUser } from "@/context/user-context";
+import { useAudioPermission } from "@/hooks/use-audio-permission";
 
 type Mode = "pitch" | "interview";
 type PitchType = "startup" | "product" | "yourself";
@@ -36,11 +38,20 @@ export default function HomeScreen() {
   const [interviewType, setInterviewType] = useState<InterviewType>("external");
   const [selectOpen, setSelectOpen] = useState(false);
 
+  const { requestPermission } = useAudioPermission();
+
   // Mock stats - would come from user data
   const streak = 3;
   const avgScore = 8.5;
 
-  const handleRecordPress = () => {};
+  const handleRecordPress = async () => {
+    const hasPermission = await requestPermission();
+
+    if (hasPermission) {
+      const currentType = mode === "pitch" ? pitchType : interviewType;
+      router.push(`/record-voice?mode=${mode}&type=${currentType}` as Href);
+    }
+  };
 
   const interviewOptions: { value: InterviewType; label: string }[] = [
     { value: "external", label: t("home.interviewType.external") },

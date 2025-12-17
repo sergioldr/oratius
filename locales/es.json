@@ -95,6 +95,21 @@
       "profile": "Perfil"
     }
   },
+  "recordVoice": {
+    "getReady": "Prepárate para hablar...",
+    "recording": "Grabando...",
+    "timeRemaining": "Tiempo restante",
+    "tapToStop": "Toca el orbe para detener la grabación",
+    "permission": {
+      "title": "Acceso al Micrófono Requerido",
+      "message": "Por favor permite el acceso al micrófono para grabar tu discurso. Puedes habilitarlo en la configuración de tu dispositivo.",
+      "openSettings": "Abrir Configuración"
+    },
+    "error": {
+      "title": "Error de Grabación",
+      "startFailed": "No se pudo iniciar la grabación. Por favor intenta de nuevo."
+    }
+  },
   "profile": {
     "headerSubtitle": "Sesión de invitado • Los cambios son temporales",
     "guestUser": "Usuario Invitado",

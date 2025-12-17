@@ -95,6 +95,21 @@
       "profile": "Profile"
     }
   },
+  "recordVoice": {
+    "getReady": "Get ready to speak...",
+    "recording": "Recording...",
+    "timeRemaining": "Time remaining",
+    "tapToStop": "Tap the orb to stop recording",
+    "permission": {
+      "title": "Microphone Access Required",
+      "message": "Please allow microphone access to record your speech. You can enable this in your device settings.",
+      "openSettings": "Open Settings"
+    },
+    "error": {
+      "title": "Recording Error",
+      "startFailed": "Failed to start recording. Please try again."
+    }
+  },
   "profile": {
     "headerSubtitle": "Guest session • Changes are temporary",
     "guestUser": "Guest User",

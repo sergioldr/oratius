@@ -1,7 +1,5 @@
 import { Redirect, Stack } from "expo-router";
-import { Icon, Label, NativeTabs } from "expo-router/unstable-native-tabs";
-import { useTranslation } from "react-i18next";
-import { ActivityIndicator, DynamicColorIOS, Platform } from "react-native";
+import { ActivityIndicator, Platform } from "react-native";
 import { YStack } from "tamagui";
 
 import { BottomTabBar } from "@/components/bottom-tab-bar";
@@ -9,12 +7,11 @@ import { useAuth } from "@/context/auth-context";
 
 /**
  * Layout for authenticated screens
- * Uses NativeTabs for iOS native tab bar with Liquid Glass support (iOS 26+)
- * Falls back to custom BottomTabBar on other platforms
+ * Uses Stack navigation with full screen modal for record-voice
+ * Falls back to custom BottomTabBar on non-iOS platforms
  * Redirects to index if user is not authenticated
  */
 export default function AuthLayout() {
-  const { t } = useTranslation();
   const { session, isLoading } = useAuth();
 
   // Show loading indicator while checking authentication state
@@ -31,34 +28,21 @@ export default function AuthLayout() {
     return <Redirect href="/" />;
   }
 
-  // Use NativeTabs on iOS for native tab bar with Liquid Glass support
+  // Use Stack navigation on iOS
   if (Platform.OS === "ios") {
     return (
-      <NativeTabs
-        labelStyle={{
-          color: DynamicColorIOS({
-            dark: "white",
-            light: "black",
-          }),
-        }}
-        tintColor={DynamicColorIOS({
-          dark: "white",
-          light: "black",
-        })}
-      >
-        <NativeTabs.Trigger name="feedback">
-          <Icon sf={{ default: "text.bubble", selected: "text.bubble.fill" }} />
-          <Label>{t("home.tabs.feedback")}</Label>
-        </NativeTabs.Trigger>
-        <NativeTabs.Trigger name="home">
-          <Icon sf={{ default: "waveform", selected: "waveform" }} />
-          <Label>{t("home.tabs.practice")}</Label>
-        </NativeTabs.Trigger>
-        <NativeTabs.Trigger name="profile">
-          <Icon sf={{ default: "person", selected: "person.fill" }} />
-          <Label>{t("home.tabs.profile")}</Label>
-        </NativeTabs.Trigger>
-      </NativeTabs>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="feedback" options={{ headerShown: false }} />
+        <Stack.Screen name="home" options={{ headerShown: false }} />
+        <Stack.Screen name="profile" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="record-voice"
+          options={{
+            presentation: "fullScreenModal",
+            animation: "fade",
+          }}
+        />
+      </Stack>
     );
   }
 
@@ -67,6 +51,13 @@ export default function AuthLayout() {
     <YStack flex={1}>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="home" />
+        <Stack.Screen
+          name="record-voice"
+          options={{
+            presentation: "fullScreenModal",
+            animation: "fade",
+          }}
+        />
       </Stack>
       <BottomTabBar />
     </YStack>
