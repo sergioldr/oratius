@@ -1,4 +1,7 @@
-import { Audio } from "expo-av";
+import {
+  getRecordingPermissionsAsync,
+  requestRecordingPermissionsAsync,
+} from "expo-audio";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert, Linking } from "react-native";
@@ -12,15 +15,15 @@ export function useAudioPermission() {
 
   const requestPermission = useCallback(async (): Promise<boolean> => {
     try {
-      const { status: existingStatus } = await Audio.getPermissionsAsync();
+      const { granted: alreadyGranted } = await getRecordingPermissionsAsync();
 
-      if (existingStatus === "granted") {
+      if (alreadyGranted) {
         return true;
       }
 
-      const { status } = await Audio.requestPermissionsAsync();
+      const { granted } = await requestRecordingPermissionsAsync();
 
-      if (status === "granted") {
+      if (granted) {
         return true;
       }
 

@@ -1,4 +1,8 @@
-import { Audio } from "expo-av";
+import {
+  RecordingPresets,
+  setAudioModeAsync,
+  useAudioRecorder,
+} from "expo-audio";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -32,7 +36,9 @@ export default function RecordVoiceScreen() {
     MAX_RECORDING_TIME_SECONDS
   );
 
-  const recordingRef = useRef<Audio.Recording | null>(null);
+  // Use the new expo-audio recorder hook
+  const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const countdownRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -59,16 +65,14 @@ export default function RecordVoiceScreen() {
   // Start recording
   const startRecording = useCallback(async () => {
     try {
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
+      await setAudioModeAsync({
+        allowsRecording: true,
+        playsInSilentMode: true,
       });
 
-      const { recording: newRecording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY
-      );
+      await audioRecorder.prepareToRecordAsync();
+      audioRecorder.record();
 
-      recordingRef.current = newRecording;
       setPhase("recording");
 
       // Start the recording animations
@@ -88,10 +92,7 @@ export default function RecordVoiceScreen() {
               clearInterval(timerRef.current);
               timerRef.current = null;
             }
-            if (recordingRef.current) {
-              recordingRef.current.stopAndUnloadAsync().catch(console.error);
-              recordingRef.current = null;
-            }
+            audioRecorder.stop().catch(console.error);
             router.back();
             return 0;
           }
@@ -106,7 +107,7 @@ export default function RecordVoiceScreen() {
       );
       router.back();
     }
-  }, [t, glowOpacity, orbScale]);
+  }, [t, glowOpacity, orbScale, audioRecorder]);
 
   // Stop recording
   const stopRecording = useCallback(async () => {
@@ -115,33 +116,30 @@ export default function RecordVoiceScreen() {
       timerRef.current = null;
     }
 
-    if (recordingRef.current) {
-      try {
-        await recordingRef.current.stopAndUnloadAsync();
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: false,
-        });
+    try {
+      await audioRecorder.stop();
+      await setAudioModeAsync({
+        allowsRecording: false,
+      });
 
-        const uri = recordingRef.current.getURI();
-        console.log("Recording saved at:", uri);
+      const uri = audioRecorder.uri;
+      console.log("Recording saved at:", uri);
 
-        // Reset animations
-        glowOpacity.value = withTiming(0.3, { duration: 300 });
-        orbScale.value = withTiming(1, { duration: 300 });
+      // Reset animations
+      glowOpacity.value = withTiming(0.3, { duration: 300 });
+      orbScale.value = withTiming(1, { duration: 300 });
 
-        setPhase("stopped");
-        recordingRef.current = null;
+      setPhase("stopped");
 
-        // TODO: Navigate to feedback/analysis screen with the recording URI
-        // For now, go back to home
-        setTimeout(() => {
-          router.back();
-        }, 500);
-      } catch (error) {
-        console.error("Failed to stop recording:", error);
-      }
+      // TODO: Navigate to feedback/analysis screen with the recording URI
+      // For now, go back to home
+      setTimeout(() => {
+        router.back();
+      }, 500);
+    } catch (error) {
+      console.error("Failed to stop recording:", error);
     }
-  }, [glowOpacity, orbScale]);
+  }, [glowOpacity, orbScale, audioRecorder]);
 
   // Handle countdown
   useEffect(() => {
@@ -177,11 +175,11 @@ export default function RecordVoiceScreen() {
       if (countdownRef.current) {
         clearTimeout(countdownRef.current);
       }
-      if (recordingRef.current) {
-        recordingRef.current.stopAndUnloadAsync().catch(console.error);
+      if (audioRecorder.isRecording) {
+        audioRecorder.stop().catch(console.error);
       }
     };
-  }, []);
+  }, [audioRecorder]);
 
   // Handle orb press (stop recording)
   const handleOrbPress = () => {

@@ -1,4 +1,4 @@
-import { Redirect, router } from "expo-router";
+import { router } from "expo-router";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Text, XStack, YStack } from "tamagui";
@@ -12,9 +12,13 @@ import {
 import { VoiceOrb } from "@/components/voice-orb";
 import { useAuth } from "@/context/auth-context";
 
+/**
+ * Welcome screen shown to unauthenticated users.
+ * Auth state redirects are now handled in the root layout during splash screen.
+ */
 export default function WelcomeScreen() {
   const { t } = useTranslation();
-  const { session, isLoading, signInAnonymously } = useAuth();
+  const { isLoading, signInAnonymously } = useAuth();
   const [isSigningIn, setIsSigningIn] = useState(false);
 
   const handleGetStarted = useCallback(async () => {
@@ -31,11 +35,6 @@ export default function WelcomeScreen() {
       setIsSigningIn(false);
     }
   }, [isSigningIn, signInAnonymously]);
-
-  // Redirect to home if user already has a session
-  if (!isLoading && session) {
-    return <Redirect href="/(auth)/home" />;
-  }
 
   const handleLogin = () => {
     router.push("/login");
