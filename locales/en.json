@@ -96,8 +96,9 @@
     }
   },
   "recordVoice": {
-    "getReady": "Get ready to speak...",
+    "getReady": "Get ready to speak!",
     "recording": "Recording...",
+    "uploading": "Uploading speech...",
     "timeRemaining": "Time remaining",
     "tapToStop": "Tap the orb to stop recording",
     "permission": {
@@ -109,6 +110,27 @@
       "title": "Recording Error",
       "startFailed": "Failed to start recording. Please try again."
     }
+  },
+  "recordingError": {
+    "tryAgain": "Try Again",
+    "goHome": "Go to Home",
+    "duration_too_short": {
+      "title": "Recording Too Short",
+      "message": "Your recording needs to be at least 20 seconds long for our AI to provide meaningful feedback. Please try again with a longer recording."
+    },
+    "upload_failed": {
+      "title": "Upload Failed",
+      "message": "We couldn't upload your recording. Please check your internet connection and try again."
+    },
+    "unknown": {
+      "title": "Something Went Wrong",
+      "message": "An unexpected error occurred. Please try again."
+    }
+  },
+  "processingRecording": {
+    "title": "Analyzing Your Speech",
+    "message": "Our AI is reviewing your recording to provide personalized feedback on your delivery.",
+    "hint": "This usually takes less than a minute"
   },
   "profile": {
     "headerSubtitle": "Guest session • Changes are temporary",

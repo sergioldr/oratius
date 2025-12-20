@@ -1,18 +1,20 @@
 import { Redirect, Stack } from "expo-router";
-import { ActivityIndicator, Platform } from "react-native";
+import { ActivityIndicator, useColorScheme } from "react-native";
 import { YStack } from "tamagui";
 
-import { BottomTabBar } from "@/components/bottom-tab-bar";
+import { getDefaultScreenOptions } from "@/constants/navigation";
 import { useAuth } from "@/context/auth-context";
+import React from "react";
 
 /**
  * Layout for authenticated screens
  * Uses Stack navigation with full screen modal for record-voice
- * Falls back to custom BottomTabBar on non-iOS platforms
  * Redirects to index if user is not authenticated
  */
 export default function AuthLayout() {
   const { session, isLoading } = useAuth();
+  const colorScheme = useColorScheme();
+  const screenOptions = getDefaultScreenOptions(colorScheme);
 
   // Show loading indicator while checking authentication state
   if (isLoading) {
@@ -28,38 +30,34 @@ export default function AuthLayout() {
     return <Redirect href="/" />;
   }
 
-  // Use Stack navigation on iOS
-  if (Platform.OS === "ios") {
-    return (
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="feedback" options={{ headerShown: false }} />
-        <Stack.Screen name="home" options={{ headerShown: false }} />
-        <Stack.Screen name="profile" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="record-voice"
-          options={{
-            presentation: "fullScreenModal",
-            animation: "fade",
-          }}
-        />
-      </Stack>
-    );
-  }
-
-  // Fallback for Android and other platforms using custom BottomTabBar
   return (
-    <YStack flex={1}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="home" />
-        <Stack.Screen
-          name="record-voice"
-          options={{
-            presentation: "fullScreenModal",
-            animation: "fade",
-          }}
-        />
-      </Stack>
-      <BottomTabBar />
-    </YStack>
+    <Stack screenOptions={screenOptions}>
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="record-voice"
+        options={{
+          presentation: "fullScreenModal",
+          animation: "fade",
+          headerShown: true,
+          headerTransparent: true,
+          headerTitle: "",
+        }}
+      />
+      <Stack.Screen
+        name="recording-error"
+        options={{
+          presentation: "fullScreenModal",
+          animation: "none",
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="processing-recording"
+        options={{
+          presentation: "fullScreenModal",
+          animation: "fade",
+        }}
+      />
+    </Stack>
   );
 }

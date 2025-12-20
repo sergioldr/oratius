@@ -1,4 +1,4 @@
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { useEffect } from "react";
 import { useWindowDimensions } from "react-native";
 import Animated, {
@@ -96,7 +96,7 @@ export function PulsingMicButton({ onPress }: PulsingMicButtonProps) {
         shadowRadius={16}
         elevation={8}
       >
-        <MaterialIcons name="mic" size={iconSize} color="white" />
+        <Ionicons name="mic" size={iconSize} color="white" />
       </Button>
     </YStack>
   );

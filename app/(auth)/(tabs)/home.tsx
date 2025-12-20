@@ -108,7 +108,7 @@ export default function HomeScreen() {
           {/* Stats Row */}
           <XStack gap="$3" marginBottom="$6">
             <StatCard
-              icon="local-fire-department"
+              icon="flame"
               iconColor="#22c55e"
               iconBgColor="rgba(34, 197, 94, 0.15)"
               label={t("home.stats.streak")}

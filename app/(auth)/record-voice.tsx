@@ -1,224 +1,215 @@
-import {
-  RecordingPresets,
-  setAudioModeAsync,
-  useAudioRecorder,
-} from "expo-audio";
-import { router, useLocalSearchParams } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { router, Stack, useLocalSearchParams } from "expo-router";
+import { useCallback, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert, StyleSheet, TouchableOpacity } from "react-native";
-import Animated, {
-  FadeIn,
-  FadeOut,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withSpring,
-  withTiming,
-} from "react-native-reanimated";
+import { Alert, Pressable, StyleSheet, useColorScheme } from "react-native";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, YStack } from "tamagui";
 
 import { VoiceOrb } from "@/components/voice-orb";
+import { getDefaultScreenOptions } from "@/constants/navigation";
+import { useAuth } from "@/context/auth-context";
+import { useAudioLevel } from "@/hooks/use-audio-level";
+import { useCountdown } from "@/hooks/use-countdown";
+import { useRecording } from "@/hooks/use-recording";
+import {
+  deleteLocalFile,
+  useRecordingUpload,
+} from "@/hooks/use-recording-upload";
 
-type RecordingPhase = "countdown" | "recording" | "stopped";
-
-const MAX_RECORDING_TIME_SECONDS = 10 * 60; // 10 minutes in seconds
+const MIN_RECORDING_TIME_SECONDS = 20;
 
 export default function RecordVoiceScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{ mode: string; type: string }>();
+  const { user } = useAuth();
+  const colorScheme = useColorScheme();
+  const defaultScreenOptions = getDefaultScreenOptions(colorScheme);
 
-  const [phase, setPhase] = useState<RecordingPhase>("countdown");
-  const [countdown, setCountdown] = useState(3);
-  const [remainingTime, setRemainingTime] = useState(
-    MAX_RECORDING_TIME_SECONDS
-  );
-
-  // Use the new expo-audio recorder hook
-  const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
-
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const countdownRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Animation values for the orb
-  const glowOpacity = useSharedValue(0.3);
-  const orbScale = useSharedValue(1);
-
-  // Countdown animation scale
-  const countdownScale = useSharedValue(1);
-
-  const countdownAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: countdownScale.value }],
-  }));
-
-  // Format time as MM:SS
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs
-      .toString()
-      .padStart(2, "0")}`;
-  };
-
-  // Start recording
-  const startRecording = useCallback(async () => {
-    try {
-      await setAudioModeAsync({
-        allowsRecording: true,
-        playsInSilentMode: true,
-      });
-
-      await audioRecorder.prepareToRecordAsync();
-      audioRecorder.record();
-
-      setPhase("recording");
-
-      // Start the recording animations
-      glowOpacity.value = withRepeat(
-        withTiming(0.8, { duration: 1000 }),
-        -1,
-        true
-      );
-      orbScale.value = withRepeat(withSpring(1.05, { damping: 10 }), -1, true);
-
-      // Start the countdown timer
-      timerRef.current = setInterval(() => {
-        setRemainingTime((prev) => {
-          if (prev <= 1) {
-            // Timer ran out - stop recording
-            if (timerRef.current) {
-              clearInterval(timerRef.current);
-              timerRef.current = null;
-            }
-            audioRecorder.stop().catch(console.error);
-            router.back();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    } catch (error) {
-      console.error("Failed to start recording:", error);
+  // Recording hook
+  const {
+    audioRecorder,
+    phase,
+    setPhase,
+    remainingTime,
+    startRecording,
+    stopRecording,
+    formatTime,
+  } = useRecording({
+    onTimeExpired: () => router.back(),
+    onError: () => {
       Alert.alert(
         t("recordVoice.error.title"),
         t("recordVoice.error.startFailed")
       );
       router.back();
-    }
-  }, [t, glowOpacity, orbScale, audioRecorder]);
+    },
+  });
 
-  // Stop recording
-  const stopRecording = useCallback(async () => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
+  // Upload hook
+  const { uploadRecording } = useRecordingUpload();
 
-    try {
-      await audioRecorder.stop();
-      await setAudioModeAsync({
-        allowsRecording: false,
+  // Audio level hook for visual feedback
+  const { animationValues } = useAudioLevel(
+    audioRecorder,
+    phase === "recording"
+  );
+  const { amplitude, speed, scale, glowOpacity } = animationValues;
+
+  // Handle recording complete
+  const handleRecordingComplete = useCallback(async () => {
+    const { uri, duration } = await stopRecording();
+
+    // Check minimum duration requirement
+    if (duration < MIN_RECORDING_TIME_SECONDS) {
+      // Clean up local file - recording doesn't meet requirements
+      if (uri) {
+        deleteLocalFile(uri);
+      }
+      router.push({
+        pathname: "/(auth)/recording-error",
+        params: {
+          errorType: "duration_too_short",
+          mode: params.mode,
+          type: params.type,
+        },
       });
-
-      const uri = audioRecorder.uri;
-      console.log("Recording saved at:", uri);
-
-      // Reset animations
-      glowOpacity.value = withTiming(0.3, { duration: 300 });
-      orbScale.value = withTiming(1, { duration: 300 });
-
-      setPhase("stopped");
-
-      // TODO: Navigate to feedback/analysis screen with the recording URI
-      // For now, go back to home
-      setTimeout(() => {
-        router.back();
-      }, 500);
-    } catch (error) {
-      console.error("Failed to stop recording:", error);
-    }
-  }, [glowOpacity, orbScale, audioRecorder]);
-
-  // Handle countdown
-  useEffect(() => {
-    if (phase === "countdown") {
-      // Animate countdown number
-      countdownScale.value = withSpring(1.2, { damping: 8 });
-      setTimeout(() => {
-        countdownScale.value = withSpring(1, { damping: 8 });
-      }, 300);
-
-      countdownRef.current = setTimeout(() => {
-        if (countdown > 1) {
-          setCountdown(countdown - 1);
-        } else {
-          startRecording();
-        }
-      }, 1000);
+      return;
     }
 
-    return () => {
-      if (countdownRef.current) {
-        clearTimeout(countdownRef.current);
-      }
-    };
-  }, [phase, countdown, startRecording, countdownScale]);
+    setPhase("uploading");
 
-  // Cleanup on unmount
+    if (uri && user?.id) {
+      // Note: uploadRecording handles cleanup for both success and failure
+      const result = await uploadRecording(uri, user.id);
+
+      if (result.success && result.recordingId) {
+        router.replace({
+          pathname: "/(auth)/processing-recording",
+          params: {
+            recordingId: result.recordingId,
+            mode: params.mode,
+            type: params.type,
+          },
+        });
+      } else {
+        router.push({
+          pathname: "/(auth)/recording-error",
+          params: {
+            errorType: "upload_failed",
+            mode: params.mode,
+            type: params.type,
+          },
+        });
+      }
+    } else {
+      // Handle missing user ID - clean up local file
+      if (uri) {
+        deleteLocalFile(uri);
+      }
+      router.push({
+        pathname: "/(auth)/recording-error",
+        params: {
+          errorType: "unknown",
+          mode: params.mode,
+          type: params.type,
+        },
+      });
+    }
+  }, [
+    stopRecording,
+    setPhase,
+    params.mode,
+    params.type,
+    user?.id,
+    uploadRecording,
+  ]);
+
+  // Countdown hook
+  const {
+    countdown,
+    isActive: isCountdownActive,
+    animatedStyle: countdownAnimatedStyle,
+    startCountdown,
+    cancelCountdown,
+  } = useCountdown({
+    initialCount: 3,
+    onComplete: startRecording,
+  });
+
+  // Start countdown on mount
   useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-      if (countdownRef.current) {
-        clearTimeout(countdownRef.current);
-      }
-      if (audioRecorder.isRecording) {
-        audioRecorder.stop().catch(console.error);
-      }
-    };
-  }, [audioRecorder]);
+    setPhase("countdown");
+    startCountdown();
+  }, [setPhase, startCountdown]);
 
   // Handle orb press (stop recording)
-  const handleOrbPress = () => {
+  const handleOrbPress = useCallback(() => {
     if (phase === "recording") {
-      stopRecording();
+      handleRecordingComplete();
     }
-  };
+  }, [phase, handleRecordingComplete]);
 
   // Handle back/cancel
-  const handleCancel = async () => {
-    if (phase === "countdown") {
-      if (countdownRef.current) {
-        clearTimeout(countdownRef.current);
-      }
-      router.back();
-    } else if (phase === "recording") {
-      await stopRecording();
+  const handleCancel = useCallback(async () => {
+    if (isCountdownActive) {
+      cancelCountdown();
     }
-  };
+    // Stop recording if active and clean up the file before navigating
+    if (phase === "recording") {
+      try {
+        const { uri } = await stopRecording();
+        // Clean up local file since user is canceling
+        if (uri) {
+          deleteLocalFile(uri);
+        }
+      } catch {
+        // Ignore errors - we're canceling anyway
+      }
+    }
+    router.dismissTo("/(auth)/home");
+  }, [isCountdownActive, cancelCountdown, phase, stopRecording]);
+
+  // Memoize screen options to prevent infinite re-render loop
+  const screenOptions = useMemo(
+    () => ({
+      headerTitle:
+        phase === "countdown"
+          ? t("recordVoice.getReady")
+          : phase === "recording"
+          ? t("recordVoice.recording")
+          : phase === "uploading"
+          ? t("recordVoice.uploading")
+          : "",
+      headerLeft: () => (
+        <Pressable onPress={handleCancel} hitSlop={10}>
+          <Ionicons
+            name="chevron-back"
+            size={32}
+            color={defaultScreenOptions.headerTintColor}
+            style={{ opacity: 0.8 }}
+          />
+        </Pressable>
+      ),
+    }),
+    [phase, t, defaultScreenOptions.headerTintColor, handleCancel]
+  );
+
+  const isCountdownPhase = phase === "countdown" && isCountdownActive;
 
   return (
     <YStack
       flex={1}
       backgroundColor="$backgroundStrong"
-      paddingTop={insets.top}
       paddingBottom={insets.bottom}
     >
-      {/* Header with cancel button */}
-      <YStack paddingHorizontal="$5" paddingVertical="$4">
-        <TouchableOpacity onPress={handleCancel}>
-          <Text fontSize="$4" color="$gray11" fontWeight="600">
-            {t("common.cancel")}
-          </Text>
-        </TouchableOpacity>
-      </YStack>
+      <Stack.Screen options={screenOptions} />
 
       {/* Main content */}
       <YStack flex={1} alignItems="center" justifyContent="center">
-        {phase === "countdown" ? (
+        {isCountdownPhase ? (
           <Animated.View
             entering={FadeIn.duration(300)}
             exiting={FadeOut.duration(200)}
@@ -261,19 +252,15 @@ export default function RecordVoiceScreen() {
             {/* Voice Orb */}
             <VoiceOrb
               isRecording={phase === "recording"}
-              glowOpacity={glowOpacity.value}
-              scale={orbScale.value}
-              amplitude={0.6}
-              speed={1.5}
-              orbColor={[1.0, 0.25, 0.37]} // Reddish color while recording
+              glowOpacity={glowOpacity}
+              scale={scale}
+              amplitude={amplitude}
+              speed={speed}
               onPress={handleOrbPress}
             />
 
             {/* Instructions */}
             <YStack alignItems="center" marginTop="$8">
-              <Text fontSize="$5" fontWeight="600" color="$color">
-                {t("recordVoice.recording")}
-              </Text>
               <Text
                 fontSize="$3"
                 color="$gray11"

@@ -3,7 +3,6 @@ import {
   StyleProp,
   StyleSheet,
   TouchableOpacity,
-  View,
   ViewStyle,
 } from "react-native";
 import Animated, {
@@ -18,7 +17,7 @@ interface VoiceOrbProps {
   scale: number;
   amplitude: number;
   speed: number;
-  orbColor: [number, number, number]; // expecting [r, g, b]
+  orbColor?: number[]; // expecting [r, g, b]
   style?: StyleProp<ViewStyle>;
   onPress?: () => void;
 }
@@ -33,15 +32,21 @@ export function VoiceOrb({
   style,
   onPress,
 }: VoiceOrbProps) {
+  const orbColorValues =
+    orbColor ?? (isRecording ? [1, 0.1, 0.6] : [0.35, 0.6, 1.0]);
   const glowColor = isRecording ? "rgb(244, 63, 94)" : "rgb(37, 71, 244)";
   const shadowColor = isRecording
     ? "rgba(255, 182, 193, 0.45)"
     : "rgba(37, 71, 244, 0.45)";
 
   const glowAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(glowOpacity, { duration: 300 }),
-    shadowColor: withTiming(glowColor, { duration: 700 }),
-    backgroundColor: withTiming(glowColor, { duration: 700 }),
+    opacity: withTiming(glowOpacity, { duration: isRecording ? 0 : 300 }),
+    shadowColor: withTiming(glowColor, { duration: isRecording ? 0 : 700 }),
+    backgroundColor: withTiming(glowColor, { duration: isRecording ? 0 : 700 }),
+  }));
+
+  const orbAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: withTiming(scale, { duration: 50 }) }],
   }));
 
   return (
@@ -57,18 +62,22 @@ export function VoiceOrb({
       />
 
       {/* Orb container */}
-      <View
+      <Animated.View
         style={[
           styles.orbContainer,
+          orbAnimatedStyle,
           {
-            transform: [{ scale }],
             shadowColor,
           },
         ]}
       >
         {/* Iridescent shader background */}
-        <Iridescence amplitude={amplitude} speed={speed} color={orbColor} />
-      </View>
+        <Iridescence
+          amplitude={amplitude}
+          speed={speed}
+          color={orbColorValues}
+        />
+      </Animated.View>
     </TouchableOpacity>
   );
 }

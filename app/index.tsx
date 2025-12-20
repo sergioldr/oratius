@@ -66,7 +66,6 @@ export default function WelcomeScreen() {
               scale={1}
               amplitude={0.5}
               speed={1.2}
-              orbColor={[0.35, 0.6, 1.0]}
             />
           </YStack>
 
@@ -98,17 +97,17 @@ export default function WelcomeScreen() {
           {/* Feature Cards */}
           <YStack gap="$3" width="100%" marginBottom="$2">
             <FeatureCard
-              icon="record-voice-over"
+              icon="mic"
               title={t("welcome.features.practice.title")}
               description={t("welcome.features.practice.description")}
             />
             <FeatureCard
-              icon="bolt"
+              icon="flash"
               title={t("welcome.features.feedback.title")}
               description={t("welcome.features.feedback.description")}
             />
             <FeatureCard
-              icon="show-chart"
+              icon="trending-up"
               title={t("welcome.features.progress.title")}
               description={t("welcome.features.progress.description")}
             />

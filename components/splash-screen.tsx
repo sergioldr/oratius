@@ -2,7 +2,7 @@ import {
   DancingScript_700Bold,
   useFonts as useDancingScriptFonts,
 } from "@expo-google-fonts/dancing-script";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useCallback, useEffect, useRef } from "react";
 import { Animated, Dimensions, StyleSheet, Text, View } from "react-native";
@@ -123,7 +123,7 @@ export function SplashScreen({ onReady }: SplashScreenProps) {
         {/* Footer Meta */}
         <View style={styles.footerMeta}>
           <View style={styles.poweredByContainer}>
-            <MaterialIcons name="auto-awesome" size={18} color="white" />
+            <Ionicons name="sparkles" size={18} color="white" />
             <Text style={styles.poweredByText}>POWERED BY AI</Text>
           </View>
           <Text style={styles.versionText}>v1.0</Text>

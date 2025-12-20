@@ -1,11 +1,11 @@
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { Button, type ButtonProps, Text, useTheme } from "tamagui";
 
-type MaterialIconName = keyof typeof MaterialIcons.glyphMap;
+type IoniconsName = keyof typeof Ionicons.glyphMap;
 
 interface SecondaryButtonProps extends Omit<ButtonProps, "icon" | "children"> {
   children: string;
-  icon?: MaterialIconName;
+  icon?: IoniconsName;
   iconPosition?: "left" | "right";
   iconSize?: number;
 }
@@ -45,7 +45,7 @@ export function SecondaryButton({
       {...props}
     >
       {icon && iconPosition === "left" && (
-        <MaterialIcons name={icon} size={iconSize} color={iconColor} />
+        <Ionicons name={icon} size={iconSize} color={iconColor} />
       )}
       <Text
         fontSize="$2"
@@ -58,7 +58,7 @@ export function SecondaryButton({
         {children}
       </Text>
       {icon && iconPosition === "right" && (
-        <MaterialIcons name={icon} size={iconSize} color={iconColor} />
+        <Ionicons name={icon} size={iconSize} color={iconColor} />
       )}
     </Button>
   );

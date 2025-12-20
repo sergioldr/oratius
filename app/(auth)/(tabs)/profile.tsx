@@ -1,4 +1,4 @@
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -530,8 +530,8 @@ export default function ProfileScreen() {
                 <Text fontSize="$3" fontWeight="500" color="$color">
                   {t("profile.settings.resetOnboarding")}
                 </Text>
-                <MaterialIcons
-                  name="chevron-right"
+                <Ionicons
+                  name="chevron-forward"
                   size={24}
                   color={secondaryTextColor}
                 />
@@ -547,8 +547,8 @@ export default function ProfileScreen() {
                 <Text fontSize="$3" fontWeight="500" color="$color">
                   {t("profile.settings.dataPrivacy")}
                 </Text>
-                <MaterialIcons
-                  name="chevron-right"
+                <Ionicons
+                  name="chevron-forward"
                   size={24}
                   color={secondaryTextColor}
                 />

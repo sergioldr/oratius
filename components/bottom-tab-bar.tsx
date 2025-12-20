@@ -1,11 +1,11 @@
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { router, usePathname } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, XStack, YStack } from "tamagui";
 
 interface TabItemProps {
-  icon: keyof typeof MaterialIcons.glyphMap;
+  icon: keyof typeof Ionicons.glyphMap;
   label: string;
   active?: boolean;
   onPress?: () => void;
@@ -22,11 +22,7 @@ function TabItem({ icon, label, active = false, onPress }: TabItemProps) {
       pressStyle={{ opacity: 0.8 }}
       onPress={onPress}
     >
-      <MaterialIcons
-        name={icon}
-        size={26}
-        color={active ? "#2547f4" : "#6b7280"}
-      />
+      <Ionicons name={icon} size={26} color={active ? "#2547f4" : "#6b7280"} />
       <Text
         fontSize={10}
         fontWeight={active ? "600" : "500"}
@@ -45,12 +41,12 @@ export function BottomTabBar() {
 
   const tabs = [
     {
-      icon: "show-chart" as const,
+      icon: "trending-up" as const,
       label: t("home.tabs.feedback"),
       path: "/feedback",
     },
     {
-      icon: "graphic-eq" as const,
+      icon: "pulse" as const,
       label: t("home.tabs.practice"),
       path: "/home",
     },

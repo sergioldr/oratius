@@ -6,7 +6,7 @@ import {
   useFonts,
 } from "@expo-google-fonts/montserrat";
 import { Roboto_500Medium } from "@expo-google-fonts/roboto";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import {
   DarkTheme,
   DefaultTheme,
@@ -21,6 +21,7 @@ import "react-native-reanimated";
 import { TamaguiProvider, Theme } from "tamagui";
 
 import { SplashScreen } from "@/components/splash-screen";
+import { getDefaultScreenOptions } from "@/constants/navigation";
 import { AuthProvider, useAuth } from "@/context/auth-context";
 import { UserProvider } from "@/context/user-context";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -122,9 +123,11 @@ function AppContent({ colorScheme }: AppContentProps) {
     return <SplashScreen onReady={handleSplashReady} />;
   }
 
+  const screenOptions = getDefaultScreenOptions(colorScheme);
+
   return (
     <>
-      <Stack screenOptions={{ headerShown: false }}>
+      <Stack screenOptions={screenOptions}>
         <Stack.Screen name="index" options={{ title: "" }} />
         <Stack.Screen
           name="login"
@@ -145,10 +148,10 @@ function AppContent({ colorScheme }: AppContentProps) {
             headerTransparent: true,
             headerRight: () => (
               <Pressable onPress={() => router.back()} hitSlop={10}>
-                <MaterialIcons
+                <Ionicons
                   name="close"
                   size={28}
-                  color={colorScheme === "dark" ? "white" : "black"}
+                  color={screenOptions.headerTintColor}
                   style={{ opacity: 0.8, paddingLeft: 4.5 }}
                 />
               </Pressable>

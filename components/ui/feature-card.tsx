@@ -1,10 +1,10 @@
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { ComponentProps } from "react";
 import { Text, useTheme, XStack, YStack } from "tamagui";
 
 import { Card } from "./card";
 
-type IconName = ComponentProps<typeof MaterialIcons>["name"];
+type IconName = ComponentProps<typeof Ionicons>["name"];
 
 interface FeatureCardProps {
   icon: IconName;
@@ -26,7 +26,7 @@ export function FeatureCard({ icon, title, description }: FeatureCardProps) {
           alignItems="center"
           justifyContent="center"
         >
-          <MaterialIcons
+          <Ionicons
             name={icon}
             size={20}
             color={theme.primary6?.val || "#2547f4"}

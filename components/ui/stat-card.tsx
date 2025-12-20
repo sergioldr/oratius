@@ -1,10 +1,10 @@
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { Text, XStack, YStack } from "tamagui";
 
 import { Card } from "./card";
 
 interface StatCardProps {
-  icon: keyof typeof MaterialIcons.glyphMap;
+  icon: keyof typeof Ionicons.glyphMap;
   iconColor: string;
   iconBgColor: string;
   label: string;
@@ -29,7 +29,7 @@ export function StatCard({
           alignItems="center"
           justifyContent="center"
         >
-          <MaterialIcons name={icon} size={20} color={iconColor} />
+          <Ionicons name={icon} size={20} color={iconColor} />
         </YStack>
         <YStack>
           <Text

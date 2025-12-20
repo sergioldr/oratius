@@ -69,7 +69,7 @@ export function Select<T extends string>({
       <SecondaryButton
         height={44}
         paddingHorizontal="$4"
-        icon="keyboard-arrow-down"
+        icon="chevron-down"
         iconPosition="right"
         onPress={() => onOpenChange(true)}
       >

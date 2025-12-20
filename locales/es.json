@@ -96,8 +96,9 @@
     }
   },
   "recordVoice": {
-    "getReady": "Prepárate para hablar...",
+    "getReady": "¡Prepárate para hablar!",
     "recording": "Grabando...",
+    "uploading": "Subiendo discurso...",
     "timeRemaining": "Tiempo restante",
     "tapToStop": "Toca el orbe para detener la grabación",
     "permission": {
@@ -109,6 +110,27 @@
       "title": "Error de Grabación",
       "startFailed": "No se pudo iniciar la grabación. Por favor intenta de nuevo."
     }
+  },
+  "recordingError": {
+    "tryAgain": "Intentar de Nuevo",
+    "goHome": "Ir al Inicio",
+    "duration_too_short": {
+      "title": "Grabación Muy Corta",
+      "message": "Tu grabación debe tener al menos 20 segundos para que nuestra IA pueda darte retroalimentación útil. Por favor intenta de nuevo con una grabación más larga."
+    },
+    "upload_failed": {
+      "title": "Error al Subir",
+      "message": "No pudimos subir tu grabación. Por favor verifica tu conexión a internet e intenta de nuevo."
+    },
+    "unknown": {
+      "title": "Algo Salió Mal",
+      "message": "Ocurrió un error inesperado. Por favor intenta de nuevo."
+    }
+  },
+  "processingRecording": {
+    "title": "Analizando Tu Discurso",
+    "message": "Nuestra IA está revisando tu grabación para darte retroalimentación personalizada sobre tu presentación.",
+    "hint": "Esto usualmente toma menos de un minuto"
   },
   "profile": {
     "headerSubtitle": "Sesión de invitado • Los cambios son temporales",

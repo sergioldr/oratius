@@ -42,7 +42,7 @@ void main() {
 `;
 
 type IridescenceProps = {
-  color?: [number, number, number];
+  color?: number[];
   speed?: number;
   amplitude?: number;
 };
@@ -67,7 +67,7 @@ export function Iridescence({
   const lastTimeRef = useRef<number | undefined>(undefined);
   const currentTimeRef = useRef(0);
 
-  const targetColorRef = useRef<[number, number, number]>(color);
+  const targetColorRef = useRef<number[]>(color);
   const currentColorRef = useRef<{ r: number; g: number; b: number }>({
     r: color[0],
     g: color[1],

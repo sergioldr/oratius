@@ -1,10 +1,10 @@
-import { MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { ActivityIndicator } from "react-native";
 import { Button, type ButtonProps, Text, XStack } from "tamagui";
 
 interface PrimaryButtonProps extends Omit<ButtonProps, "children" | "icon"> {
   children: string;
-  iconRight?: keyof typeof MaterialIcons.glyphMap;
+  iconRight?: keyof typeof Ionicons.glyphMap;
   isLoading?: boolean;
 }
 
@@ -42,9 +42,7 @@ export function PrimaryButton({
             <Text color="white" fontSize="$5" fontWeight="600">
               {children}
             </Text>
-            {iconRight && (
-              <MaterialIcons name={iconRight} size={20} color="white" />
-            )}
+            {iconRight && <Ionicons name={iconRight} size={20} color="white" />}
           </>
         )}
       </XStack>
