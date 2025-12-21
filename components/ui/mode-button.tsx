@@ -22,23 +22,22 @@ export function ModeButton({
 
   const getBackgroundColor = () => {
     if (isOutlined) {
-      return selected
-        ? isDark
-          ? "$primary11"
-          : "$gray3"
-        : "$buttonBackground";
+      return selected ? "$buttonSelectedBackground" : "$buttonBackground";
     }
     return selected ? "$primary6" : "$buttonBackground";
   };
 
   const getBorderColor = () => {
-    if (isOutlined && selected) {
-      return isDark ? "$primary10" : "$gray4";
+    if (isOutlined) {
+      return selected ? "$buttonSelectedBorderColor" : "$buttonBorderColor";
     }
     return selected ? "$primary6" : "$buttonBorderColor";
   };
 
   const getTextColor = () => {
+    if (isOutlined && selected) {
+      return "$primary6";
+    }
     return selected && variant === "default" ? "white" : "$color";
   };
 

@@ -135,11 +135,13 @@
   "profile": {
     "headerSubtitle": "Guest session • Changes are temporary",
     "guestUser": "Guest User",
+    "heroDescription": "Create an account to save your progress and get personalized AI feedback.",
     "unregisteredSession": "Unregistered session",
     "guest": "Guest",
     "freeTier": "Free Tier",
     "createFreeAccount": "Create free account",
     "logIn": "Log In",
+    "whyNeeded": "Why do we need this?",
     "aboutYou": {
       "title": "About you",
       "description": "This helps the AI adapt feedback.",
@@ -214,6 +216,10 @@
       "deleteAccount": "Delete Account"
     },
     "alerts": {
+      "whyNeeded": {
+        "title": "Why We Need This Information",
+        "message": "Your profile helps our AI provide more relevant and personalized feedback tailored to your role, industry, and communication goals."
+      },
       "signOut": {
         "title": "Sign Out",
         "message": "All your temporary data will be lost, including all analyzed audios. Are you sure you want to sign out?",

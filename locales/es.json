@@ -135,11 +135,13 @@
   "profile": {
     "headerSubtitle": "Sesión de invitado • Los cambios son temporales",
     "guestUser": "Usuario Invitado",
+    "heroDescription": "Crea una cuenta para guardar tu progreso y recibir retroalimentación personalizada de IA.",
     "unregisteredSession": "Sesión no registrada",
     "guest": "Invitado",
     "freeTier": "Plan Gratuito",
     "createFreeAccount": "Crear cuenta gratis",
     "logIn": "Iniciar Sesión",
+    "whyNeeded": "¿Por qué necesitamos esto?",
     "aboutYou": {
       "title": "Sobre ti",
       "description": "Esto ayuda a la IA a adaptar la retroalimentación.",
@@ -214,6 +216,10 @@
       "deleteAccount": "Eliminar Cuenta"
     },
     "alerts": {
+      "whyNeeded": {
+        "title": "¿Por Qué Necesitamos Esta Información?",
+        "message": "Tu perfil ayuda a nuestra IA a proporcionar retroalimentación más relevante y personalizada adaptada a tu rol, industria y objetivos de comunicación."
+      },
       "signOut": {
         "title": "Cerrar Sesión",
         "message": "Todos tus datos temporales se perderán, incluyendo todos los audios analizados. ¿Estás seguro de que quieres cerrar sesión?",

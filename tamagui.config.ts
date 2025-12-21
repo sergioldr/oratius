@@ -146,6 +146,9 @@ const tamaguiConfig = createTamagui({
       // Switch colors
       switchBackground: BORDER_DARK,
       switchBorderColor: BORDER_DARK,
+      // Selected button colors
+      buttonSelectedBackground: "rgba(37, 71, 244, 0.15)",
+      buttonSelectedBorderColor: "rgba(37, 71, 244, 0.3)",
     },
     light: {
       ...config.themes.light,
@@ -172,6 +175,9 @@ const tamaguiConfig = createTamagui({
       // Switch colors
       switchBackground: BORDER_LIGHT,
       switchBorderColor: BORDER_LIGHT,
+      // Selected button colors
+      buttonSelectedBackground: "rgba(37, 71, 244, 0.1)",
+      buttonSelectedBorderColor: "rgba(37, 71, 244, 0.2)",
     },
   },
 });
