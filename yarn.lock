@@ -1461,7 +1461,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@expo-google-fonts/dancing-script@npm:^0.4.2":
+"@expo-google-fonts/dancing-script@npm:0.4.2":
   version: 0.4.2
   resolution: "@expo-google-fonts/dancing-script@npm:0.4.2"
   checksum: 10c0/602f58b92df2a78c784f3aa6fe7b0e3dadf911436a3811ed781e5e6992090007a33fa74d25d3cb0a422c2804eda25a0602d9ca61d8b88fd07733f3da2ae86a61
@@ -1475,7 +1475,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@expo-google-fonts/roboto@npm:^0.4.2":
+"@expo-google-fonts/roboto@npm:0.4.2":
   version: 0.4.2
   resolution: "@expo-google-fonts/roboto@npm:0.4.2"
   checksum: 10c0/4a1fe1a17ca8de8af3e5396585fc6a5bade55d5b7caa249698db6b0222690f087db8b9da94dbef67c9efa3fefcc09567c0d3c09b7e4b8d40abbb9602c07d027b
@@ -2046,6 +2046,13 @@ __metadata:
   version: 0.4.3
   resolution: "@humanwhocodes/retry@npm:0.4.3"
   checksum: 10c0/3775bb30087d4440b3f7406d5a057777d90e4b9f435af488a4923ef249e93615fb78565a85f173a186a076c7706a81d0d57d563a2624e4de2c5c9c66c486ce42
+  languageName: node
+  linkType: hard
+
+"@ide/backoff@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@ide/backoff@npm:1.0.0"
+  checksum: 10c0/e0c176e1894cf0a8f2d4056030d70c52f7e83db15bc0d1422a94f69e8b4c4a73c352791123f1ec647d66232a267353156fcc9e5eec02833e00189a60f057b331
   languageName: node
   linkType: hard
 
@@ -3165,65 +3172,65 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@supabase/auth-js@npm:2.87.3":
-  version: 2.87.3
-  resolution: "@supabase/auth-js@npm:2.87.3"
+"@supabase/auth-js@npm:2.89.0":
+  version: 2.89.0
+  resolution: "@supabase/auth-js@npm:2.89.0"
   dependencies:
     tslib: "npm:2.8.1"
-  checksum: 10c0/5da74afca580f7a0833c5aa0362c4baf85e48aa91176bd0441a7f627989645163c21b2e17ac3d2ae69050f506120f36490908bd542d4b49b7ee35e7f436c02db
+  checksum: 10c0/b22e231589791437fd261f1f54d62d286875698b7deb0a8c09b1f5a6c33be781641ef3602ba81767a592765cb0d3e934b03f6804c83eef0983083ed048fdf9a4
   languageName: node
   linkType: hard
 
-"@supabase/functions-js@npm:2.87.3":
-  version: 2.87.3
-  resolution: "@supabase/functions-js@npm:2.87.3"
+"@supabase/functions-js@npm:2.89.0":
+  version: 2.89.0
+  resolution: "@supabase/functions-js@npm:2.89.0"
   dependencies:
     tslib: "npm:2.8.1"
-  checksum: 10c0/c737b699c5bc69cfc8a3b4b3a488d506e3b1e0e6e71d9348c3d7e8071e938d78f0110e01ff4339a917553e4d9ad18ee1432176e03f6354a13a9a1d9ef5b24c6e
+  checksum: 10c0/45f7c98a722500debd1367c271726df5cf53f4be1c8c50f0535a1e58f76ea43867b7eef917876f1232fd6259cfe5deabcbe84b109bec61aa4a7be86073deb01f
   languageName: node
   linkType: hard
 
-"@supabase/postgrest-js@npm:2.87.3":
-  version: 2.87.3
-  resolution: "@supabase/postgrest-js@npm:2.87.3"
+"@supabase/postgrest-js@npm:2.89.0":
+  version: 2.89.0
+  resolution: "@supabase/postgrest-js@npm:2.89.0"
   dependencies:
     tslib: "npm:2.8.1"
-  checksum: 10c0/894eb7ada76bba5e39729df97e6dd170e0d437cc8620883f28f4655f3357133daa20c89443235df77e9fd50d6bc8994001ca53bb213df4873613ebf84b5bc2a2
+  checksum: 10c0/1232f482c5f93fe249e3d51157e07e82c44dbebf72cee367b1180689d0293cd2874f9f78e4f8d38409d5da2793e9ae96ed18c7e80ad1776c30700a5d05f423bd
   languageName: node
   linkType: hard
 
-"@supabase/realtime-js@npm:2.87.3":
-  version: 2.87.3
-  resolution: "@supabase/realtime-js@npm:2.87.3"
+"@supabase/realtime-js@npm:2.89.0":
+  version: 2.89.0
+  resolution: "@supabase/realtime-js@npm:2.89.0"
   dependencies:
     "@types/phoenix": "npm:^1.6.6"
     "@types/ws": "npm:^8.18.1"
     tslib: "npm:2.8.1"
     ws: "npm:^8.18.2"
-  checksum: 10c0/35ee4fba90c1d95cbfafb371c4c8433305be66373e5ee3ef9ca33b4df386f54e0902f6f81f24d07e18229d6fb4effc564a698414f30a946a170b741ef23cc0fb
+  checksum: 10c0/59f26ae1dd6b53067eed1a37f3e59ee26eb5c84e08b72e0f4a5cb299442b9404f6ba5d7b83d8ebb83ef95b9e4f2842bfe36bfb3824856645bcdfe8a75ec1e210
   languageName: node
   linkType: hard
 
-"@supabase/storage-js@npm:2.87.3":
-  version: 2.87.3
-  resolution: "@supabase/storage-js@npm:2.87.3"
+"@supabase/storage-js@npm:2.89.0":
+  version: 2.89.0
+  resolution: "@supabase/storage-js@npm:2.89.0"
   dependencies:
     iceberg-js: "npm:^0.8.1"
     tslib: "npm:2.8.1"
-  checksum: 10c0/aa8db3dcae8e73038f7c5d8372d6b7634c4de520e057531d98b1ffd22d4cf3600134bfda5713c5d6a643baafb4b209aaeeef2f0b804ff700e87854d0584fbd9c
+  checksum: 10c0/fc6ea247b3dce02b5e73c750bc5394c1436843d429ccbf93e4d826033ddb075fcfe4e0947f0ab0baccaef41654124f108b7ae440f4871a77df7fda180c4cc920
   languageName: node
   linkType: hard
 
-"@supabase/supabase-js@npm:^2.87.3":
-  version: 2.87.3
-  resolution: "@supabase/supabase-js@npm:2.87.3"
+"@supabase/supabase-js@npm:2.89.0":
+  version: 2.89.0
+  resolution: "@supabase/supabase-js@npm:2.89.0"
   dependencies:
-    "@supabase/auth-js": "npm:2.87.3"
-    "@supabase/functions-js": "npm:2.87.3"
-    "@supabase/postgrest-js": "npm:2.87.3"
-    "@supabase/realtime-js": "npm:2.87.3"
-    "@supabase/storage-js": "npm:2.87.3"
-  checksum: 10c0/bc7eabb9060f959be24d31823ad33ada693c1350b274cec67b1dd584e90fd9b3d7147901b396c3d6c6b3c87e3ed3105f166359bea9973a54c83816f519310701
+    "@supabase/auth-js": "npm:2.89.0"
+    "@supabase/functions-js": "npm:2.89.0"
+    "@supabase/postgrest-js": "npm:2.89.0"
+    "@supabase/realtime-js": "npm:2.89.0"
+    "@supabase/storage-js": "npm:2.89.0"
+  checksum: 10c0/8662023c1003d317ae433316e42d791560614a06b56f466d7586a2fdf54d34db8b184a0b784046665852756dce06f48909318fc54103cf675ec05c5c6d1757dc
   languageName: node
   linkType: hard
 
@@ -5545,6 +5552,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"assert@npm:^2.0.0":
+  version: 2.1.0
+  resolution: "assert@npm:2.1.0"
+  dependencies:
+    call-bind: "npm:^1.0.2"
+    is-nan: "npm:^1.3.2"
+    object-is: "npm:^1.1.5"
+    object.assign: "npm:^4.1.4"
+    util: "npm:^0.12.5"
+  checksum: 10c0/7271a5da883c256a1fa690677bf1dd9d6aa882139f2bed1cd15da4f9e7459683e1da8e32a203d6cc6767e5e0f730c77a9532a87b896b4b0af0dd535f668775f0
+  languageName: node
+  linkType: hard
+
 "astral-regex@npm:^2.0.0":
   version: 2.0.0
   resolution: "astral-regex@npm:2.0.0"
@@ -5783,6 +5803,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"badgin@npm:^1.1.5":
+  version: 1.2.3
+  resolution: "badgin@npm:1.2.3"
+  checksum: 10c0/f8ba1090240a8602a8d174214e3426b1a7ec3ecb820ec7e4561fd6181c07df572f02ad0e7ec9250e19dd9594d05a57719a5717a126d769f91fc0cc5d233119cf
+  languageName: node
+  linkType: hard
+
 "balanced-match@npm:^1.0.0":
   version: 1.0.2
   resolution: "balanced-match@npm:1.0.2"
@@ -5961,7 +5988,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"call-bind@npm:^1.0.7, call-bind@npm:^1.0.8":
+"call-bind@npm:^1.0.0, call-bind@npm:^1.0.2, call-bind@npm:^1.0.7, call-bind@npm:^1.0.8":
   version: 1.0.8
   resolution: "call-bind@npm:1.0.8"
   dependencies:
@@ -7579,6 +7606,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-notifications@npm:~0.32.15":
+  version: 0.32.15
+  resolution: "expo-notifications@npm:0.32.15"
+  dependencies:
+    "@expo/image-utils": "npm:^0.8.8"
+    "@ide/backoff": "npm:^1.0.0"
+    abort-controller: "npm:^3.0.0"
+    assert: "npm:^2.0.0"
+    badgin: "npm:^1.1.5"
+    expo-application: "npm:~7.0.8"
+    expo-constants: "npm:~18.0.12"
+  peerDependencies:
+    expo: "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/231e2d9fe6040e87716f71e0b4c96f4d7829b339ce2d1ab220d4165eae9085833945689cd0ba7e6ec6ab5d30567cad99f6448b0d8fe7d22ad29ceb66c75806e4
+  languageName: node
+  linkType: hard
+
 "expo-router@npm:~6.0.19":
   version: 6.0.19
   resolution: "expo-router@npm:6.0.19"
@@ -7721,16 +7767,16 @@ __metadata:
   resolution: "expo-template-default@workspace:."
   dependencies:
     "@babel/core": "npm:7.28.0"
-    "@expo-google-fonts/dancing-script": "npm:^0.4.2"
+    "@expo-google-fonts/dancing-script": "npm:0.4.2"
     "@expo-google-fonts/montserrat": "npm:0.4.2"
-    "@expo-google-fonts/roboto": "npm:^0.4.2"
+    "@expo-google-fonts/roboto": "npm:0.4.2"
     "@expo/metro-runtime": "npm:~6.1.2"
     "@expo/vector-icons": "npm:15.0.3"
     "@react-native-google-signin/google-signin": "npm:16.0.0"
     "@react-navigation/bottom-tabs": "npm:7.4.0"
     "@react-navigation/elements": "npm:2.9.1"
     "@react-navigation/native": "npm:7.1.8"
-    "@supabase/supabase-js": "npm:^2.87.3"
+    "@supabase/supabase-js": "npm:2.89.0"
     "@tamagui/babel-plugin": "npm:1.139.1"
     "@tamagui/config": "npm:1.139.1"
     "@types/react": "npm:~19.1.10"
@@ -7751,6 +7797,7 @@ __metadata:
     expo-linear-gradient: "npm:~15.0.8"
     expo-linking: "npm:~8.0.10"
     expo-localization: "npm:~17.0.8"
+    expo-notifications: "npm:~0.32.15"
     expo-router: "npm:~6.0.19"
     expo-secure-store: "npm:~15.0.8"
     expo-splash-screen: "npm:~31.0.12"
@@ -8681,7 +8728,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"inherits@npm:2, inherits@npm:2.0.4, inherits@npm:~2.0.3":
+"inherits@npm:2, inherits@npm:2.0.4, inherits@npm:^2.0.3, inherits@npm:~2.0.3":
   version: 2.0.4
   resolution: "inherits@npm:2.0.4"
   checksum: 10c0/4e531f648b29039fb7426fb94075e6545faa1eb9fe83c29f0b6d9e7263aceb4289d2d4557db0d428188eeb449cc7c5e77b0a0b2c4e248ff2a65933a0dee49ef2
@@ -8728,6 +8775,16 @@ __metadata:
   version: 10.1.0
   resolution: "ip-address@npm:10.1.0"
   checksum: 10c0/0103516cfa93f6433b3bd7333fa876eb21263912329bfa47010af5e16934eeeff86f3d2ae700a3744a137839ddfad62b900c7a445607884a49b5d1e32a3d7566
+  languageName: node
+  linkType: hard
+
+"is-arguments@npm:^1.0.4":
+  version: 1.2.0
+  resolution: "is-arguments@npm:1.2.0"
+  dependencies:
+    call-bound: "npm:^1.0.2"
+    has-tostringtag: "npm:^1.0.2"
+  checksum: 10c0/6377344b31e9fcb707c6751ee89b11f132f32338e6a782ec2eac9393b0cbd32235dad93052998cda778ee058754860738341d8114910d50ada5615912bb929fc
   languageName: node
   linkType: hard
 
@@ -8859,7 +8916,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"is-generator-function@npm:^1.0.10":
+"is-generator-function@npm:^1.0.10, is-generator-function@npm:^1.0.7":
   version: 1.1.2
   resolution: "is-generator-function@npm:1.1.2"
   dependencies:
@@ -8885,6 +8942,16 @@ __metadata:
   version: 2.0.3
   resolution: "is-map@npm:2.0.3"
   checksum: 10c0/2c4d431b74e00fdda7162cd8e4b763d6f6f217edf97d4f8538b94b8702b150610e2c64961340015fe8df5b1fcee33ccd2e9b62619c4a8a3a155f8de6d6d355fc
+  languageName: node
+  linkType: hard
+
+"is-nan@npm:^1.3.2":
+  version: 1.3.2
+  resolution: "is-nan@npm:1.3.2"
+  dependencies:
+    call-bind: "npm:^1.0.0"
+    define-properties: "npm:^1.1.3"
+  checksum: 10c0/8bfb286f85763f9c2e28ea32e9127702fe980ffd15fa5d63ade3be7786559e6e21355d3625dd364c769c033c5aedf0a2ed3d4025d336abf1b9241e3d9eddc5b0
   languageName: node
   linkType: hard
 
@@ -8977,7 +9044,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"is-typed-array@npm:^1.1.13, is-typed-array@npm:^1.1.14, is-typed-array@npm:^1.1.15":
+"is-typed-array@npm:^1.1.13, is-typed-array@npm:^1.1.14, is-typed-array@npm:^1.1.15, is-typed-array@npm:^1.1.3":
   version: 1.1.15
   resolution: "is-typed-array@npm:1.1.15"
   dependencies:
@@ -10526,6 +10593,16 @@ __metadata:
   version: 1.13.4
   resolution: "object-inspect@npm:1.13.4"
   checksum: 10c0/d7f8711e803b96ea3191c745d6f8056ce1f2496e530e6a19a0e92d89b0fa3c76d910c31f0aa270432db6bd3b2f85500a376a83aaba849a8d518c8845b3211692
+  languageName: node
+  linkType: hard
+
+"object-is@npm:^1.1.5":
+  version: 1.1.6
+  resolution: "object-is@npm:1.1.6"
+  dependencies:
+    call-bind: "npm:^1.0.7"
+    define-properties: "npm:^1.2.1"
+  checksum: 10c0/506af444c4dce7f8e31f34fc549e2fb8152d6b9c4a30c6e62852badd7f520b579c679af433e7a072f9d78eb7808d230dc12e1cf58da9154dfbf8813099ea0fe0
   languageName: node
   linkType: hard
 
@@ -13017,6 +13094,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"util@npm:^0.12.5":
+  version: 0.12.5
+  resolution: "util@npm:0.12.5"
+  dependencies:
+    inherits: "npm:^2.0.3"
+    is-arguments: "npm:^1.0.4"
+    is-generator-function: "npm:^1.0.7"
+    is-typed-array: "npm:^1.1.3"
+    which-typed-array: "npm:^1.1.2"
+  checksum: 10c0/c27054de2cea2229a66c09522d0fa1415fb12d861d08523a8846bf2e4cbf0079d4c3f725f09dcb87493549bcbf05f5798dce1688b53c6c17201a45759e7253f3
+  languageName: node
+  linkType: hard
+
 "utils-merge@npm:1.0.1":
   version: 1.0.1
   resolution: "utils-merge@npm:1.0.1"
@@ -13200,7 +13290,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"which-typed-array@npm:^1.1.16, which-typed-array@npm:^1.1.19":
+"which-typed-array@npm:^1.1.16, which-typed-array@npm:^1.1.19, which-typed-array@npm:^1.1.2":
   version: 1.1.19
   resolution: "which-typed-array@npm:1.1.19"
   dependencies:

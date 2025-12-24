@@ -149,6 +149,8 @@ const tamaguiConfig = createTamagui({
       // Selected button colors
       buttonSelectedBackground: "rgba(37, 71, 244, 0.15)",
       buttonSelectedBorderColor: "rgba(37, 71, 244, 0.3)",
+      // sheet
+      sheetBackground: BACKGROUND_DARK,
     },
     light: {
       ...config.themes.light,
@@ -178,6 +180,8 @@ const tamaguiConfig = createTamagui({
       // Selected button colors
       buttonSelectedBackground: "rgba(37, 71, 244, 0.1)",
       buttonSelectedBorderColor: "rgba(37, 71, 244, 0.2)",
+      // sheet
+      sheetBackground: BACKGROUND_LIGHT,
     },
   },
 });

@@ -1,4 +1,4 @@
-import { Button, Sheet, styled, YStack } from "tamagui";
+import { Button, Sheet, styled, View } from "tamagui";
 import { SecondaryButton } from "./secondary-button";
 
 const SelectOptionButton = styled(Button, {
@@ -36,6 +36,16 @@ const SelectOptionButton = styled(Button, {
   defaultVariants: {
     selected: false,
   },
+});
+
+const SheetHandle = styled(View, {
+  width: 40,
+  height: 4,
+  backgroundColor: "$gray8",
+  borderRadius: 2,
+  alignSelf: "center",
+  marginTop: 12,
+  marginBottom: 8,
 });
 
 interface SelectOption<T extends string> {
@@ -84,9 +94,15 @@ export function Select<T extends string>({
         dismissOnSnapToBottom
       >
         <Sheet.Overlay />
-        <Sheet.Frame padding="$4" backgroundColor="$background">
-          <Sheet.Handle />
-          <YStack gap="$2" marginTop="$4">
+        <Sheet.Frame padding="$4" backgroundColor="$sheetBackground">
+          <SheetHandle />
+          <Sheet.ScrollView
+            contentContainerStyle={{
+              gap: 8,
+              paddingTop: 12,
+              paddingBottom: 24,
+            }}
+          >
             {options.map((option) => (
               <SelectOptionButton
                 key={option.value}
@@ -99,7 +115,7 @@ export function Select<T extends string>({
                 {option.label}
               </SelectOptionButton>
             ))}
-          </YStack>
+          </Sheet.ScrollView>
         </Sheet.Frame>
       </Sheet>
     </>

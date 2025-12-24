@@ -10,6 +10,7 @@ import { PulsingMicButton } from "@/components/pulsing-mic-button";
 import { ModeButton, Select, StatCard } from "@/components/ui";
 import { useUser } from "@/context/user-context";
 import { useAudioPermission } from "@/hooks/use-audio-permission";
+import { useAuthMe } from "@/hooks/use-auth-me";
 
 type Mode = "pitch" | "interview";
 type PitchType = "startup" | "product" | "yourself";
@@ -39,6 +40,9 @@ export default function HomeScreen() {
   const [selectOpen, setSelectOpen] = useState(false);
 
   const { requestPermission } = useAudioPermission();
+
+  // Fetch current user from API server (logs result automatically)
+  useAuthMe();
 
   // Mock stats - would come from user data
   const streak = 3;

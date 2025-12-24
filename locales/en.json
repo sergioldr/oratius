@@ -154,8 +154,37 @@
       "manager": "Manager",
       "individual": "Individual Contributor"
     },
+    "speaking": {
+      "title": "Speaking"
+    },
+    "speakingRole": {
+      "title": "Speaking role",
+      "placeholder": "Select role",
+      "leadership": "Leadership",
+      "peopleManagement": "People Management",
+      "engineering": "Engineering",
+      "productProject": "Product / Project",
+      "sales": "Sales",
+      "marketingPr": "Marketing / PR",
+      "customerSuccess": "Customer Success",
+      "support": "Support",
+      "operations": "Operations",
+      "financeAccounting": "Finance / Accounting",
+      "consulting": "Consulting",
+      "founder": "Founder",
+      "hrRecruiting": "HR / Recruiting",
+      "educationTraining": "Education / Training",
+      "researchAcademia": "Research / Academia",
+      "healthcare": "Healthcare",
+      "legal": "Legal",
+      "publicSector": "Public Sector",
+      "creator": "Creator",
+      "other": "Other",
+      "preferNot": "Prefer not to say"
+    },
     "speakingContext": {
       "title": "Primary speaking context",
+      "placeholder": "Select context",
       "executiveMeetings": "Executive meetings",
       "interviews": "Interviews",
       "pitches": "Pitches",
@@ -168,29 +197,34 @@
       "finance": "Finance",
       "consulting": "Consulting",
       "healthcare": "Healthcare",
+      "education": "Education",
+      "government": "Government",
+      "manufacturing": "Manufacturing",
+      "retail": "Retail",
+      "media": "Media",
+      "nonprofit": "Nonprofit",
       "other": "Other"
     },
     "seniority": {
       "title": "Seniority",
       "placeholder": "Select seniority",
-      "senior": "Senior",
+      "junior": "Junior",
+      "emerging": "Emerging",
       "midLevel": "Mid-level",
-      "emerging": "Emerging"
+      "senior": "Senior",
+      "manager": "Manager",
+      "director": "Director",
+      "executive": "Executive"
     },
     "communication": {
       "title": "How you communicate",
-      "description": "Sign up to track your communication patterns over time.",
-      "styleTitle": "Preferred communication style",
-      "direct": "Direct",
-      "strategic": "Strategic",
-      "inspirational": "Inspirational",
-      "analytical": "Analytical"
+      "description": "Sign up to track your communication patterns over time."
     },
     "language": {
       "title": "Primary language",
       "placeholder": "Select language",
       "enUs": "English (US)",
-      "enUk": "English (UK)",
+      "enGb": "English (UK)",
       "es": "Spanish",
       "fr": "French"
     },
@@ -212,6 +246,7 @@
     },
     "actions": {
       "saveSettings": "Save temporary settings",
+      "saving": "Saving...",
       "signOut": "Sign Out",
       "deleteAccount": "Delete Account"
     },
@@ -219,6 +254,10 @@
       "whyNeeded": {
         "title": "Why We Need This Information",
         "message": "Your profile helps our AI provide more relevant and personalized feedback tailored to your role, industry, and communication goals."
+      },
+      "success": {
+        "title": "Success",
+        "saved": "Your profile has been saved successfully."
       },
       "signOut": {
         "title": "Sign Out",
@@ -238,7 +277,10 @@
       "error": {
         "title": "Error",
         "signOutFailed": "Failed to sign out. Please try again.",
-        "deleteAccountFailed": "Failed to delete account. Please try again or contact support."
+        "deleteAccountFailed": "Failed to delete account. Please try again or contact support.",
+        "mustBeSignedIn": "You must be signed in to save your profile.",
+        "saveFailed": "Failed to save profile. Please try again.",
+        "loadFailed": "Failed to load profile. Please try again."
       }
     }
   }

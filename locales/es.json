@@ -154,8 +154,37 @@
       "manager": "Gerente",
       "individual": "Colaborador Individual"
     },
+    "speaking": {
+      "title": "Comunicación"
+    },
+    "speakingRole": {
+      "title": "Rol al hablar",
+      "placeholder": "Seleccionar rol",
+      "leadership": "Liderazgo",
+      "peopleManagement": "Gestión de Personas",
+      "engineering": "Ingeniería",
+      "productProject": "Producto / Proyecto",
+      "sales": "Ventas",
+      "marketingPr": "Marketing / RR. PP.",
+      "customerSuccess": "Éxito del cliente",
+      "support": "Soporte",
+      "operations": "Operaciones",
+      "financeAccounting": "Finanzas / Contabilidad",
+      "consulting": "Consultoría",
+      "founder": "Fundador",
+      "hrRecruiting": "RR. HH. / Reclutamiento",
+      "educationTraining": "Educación / Capacitación",
+      "researchAcademia": "Investigación / Academia",
+      "healthcare": "Salud",
+      "legal": "Legal",
+      "publicSector": "Sector Público",
+      "creator": "Creador",
+      "other": "Otro",
+      "preferNot": "Prefiero no decirlo"
+    },
     "speakingContext": {
       "title": "Contexto principal de habla",
+      "placeholder": "Seleccionar contexto",
       "executiveMeetings": "Reuniones ejecutivas",
       "interviews": "Entrevistas",
       "pitches": "Presentaciones",
@@ -168,29 +197,34 @@
       "finance": "Finanzas",
       "consulting": "Consultoría",
       "healthcare": "Salud",
+      "education": "Educación",
+      "government": "Gobierno",
+      "manufacturing": "Manufactura",
+      "retail": "Comercio Minorista",
+      "media": "Medios",
+      "nonprofit": "Sin Fines de Lucro",
       "other": "Otro"
     },
     "seniority": {
       "title": "Antigüedad",
       "placeholder": "Seleccionar antigüedad",
-      "senior": "Senior",
+      "junior": "Junior",
+      "emerging": "Emergente",
       "midLevel": "Nivel medio",
-      "emerging": "Emergente"
+      "senior": "Senior",
+      "manager": "Gerente",
+      "director": "Director",
+      "executive": "Ejecutivo"
     },
     "communication": {
       "title": "Cómo te comunicas",
-      "description": "Regístrate para rastrear tus patrones de comunicación a lo largo del tiempo.",
-      "styleTitle": "Estilo de comunicación preferido",
-      "direct": "Directo",
-      "strategic": "Estratégico",
-      "inspirational": "Inspirador",
-      "analytical": "Analítico"
+      "description": "Regístrate para rastrear tus patrones de comunicación a lo largo del tiempo."
     },
     "language": {
       "title": "Idioma principal",
       "placeholder": "Seleccionar idioma",
       "enUs": "Inglés (US)",
-      "enUk": "Inglés (UK)",
+      "enGb": "Inglés (UK)",
       "es": "Español",
       "fr": "Francés"
     },
