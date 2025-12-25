@@ -1,12 +1,5 @@
-import * as Crypto from "expo-crypto";
 import { File } from "expo-file-system";
 import { useCallback, useState } from "react";
-
-import { supabase } from "@/lib/supabase";
-
-interface UploadConfig {
-  bucketName?: string;
-}
 
 interface UploadResult {
   success: boolean;
@@ -17,6 +10,13 @@ interface UploadResult {
 interface UseRecordingUploadResult {
   isUploading: boolean;
   uploadRecording: (uri: string, userId: string) => Promise<UploadResult>;
+}
+
+interface UploadUrlResponse {
+  audioId: string;
+  storagePath: string;
+  uploadUrl: string;
+  expiresIn: number;
 }
 
 /**
@@ -37,15 +37,13 @@ export function deleteLocalFile(uri: string): void {
 }
 
 /**
- * Custom hook for uploading audio recordings to Supabase storage.
+ * Custom hook for uploading audio recordings to storage via presigned URLs.
  * Handles file reading, upload, cleanup, and error management.
  * Automatically deletes local recordings after successful upload.
  */
-export function useRecordingUpload(
-  config?: UploadConfig
-): UseRecordingUploadResult {
-  const { bucketName = "dilo" } = config ?? {};
+export function useRecordingUpload(): UseRecordingUploadResult {
   const [isUploading, setIsUploading] = useState(false);
+  const apiUrl = process.env.EXPO_PUBLIC_DILO_SERVER_API_URL;
 
   const uploadRecording = useCallback(
     async (uri: string, userId: string): Promise<UploadResult> => {
@@ -53,27 +51,56 @@ export function useRecordingUpload(
         return { success: false, error: "Missing URI or user ID" };
       }
 
+      if (!apiUrl) {
+        console.error("API URL not configured");
+        return { success: false, error: "API URL not configured" };
+      }
+
       setIsUploading(true);
 
       try {
-        const recordingId = Crypto.randomUUID();
+        // Extract file extension and determine mime type
         const fileExtension = uri.split(".").pop() ?? "m4a";
-        const storagePath = `users/${userId}/recordings/${recordingId}.${fileExtension}`;
+        const mimeType = `audio/${fileExtension}`;
 
-        // Read the file as bytes using the File API
+        // Step 1: Get presigned URL from backend
+        const uploadUrlResponse = await fetch(`${apiUrl}/v1/audio/upload-url`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            mimeType,
+            fileExtension,
+          }),
+        });
+
+        if (!uploadUrlResponse.ok) {
+          console.error("Failed to get upload URL:", uploadUrlResponse.status);
+          deleteLocalFile(uri);
+          return { success: false, error: "failed_to_get_upload_url" };
+        }
+
+        const uploadData: UploadUrlResponse = await uploadUrlResponse.json();
+
+        // Step 2: Read the file as bytes using the File API
         const recordingFile = new File(uri);
         const fileBytes = await recordingFile.bytes();
 
-        const { error: uploadError } = await supabase.storage
-          .from(bucketName)
-          .upload(storagePath, fileBytes.buffer, {
-            contentType: `audio/${fileExtension}`,
-            upsert: false,
-          });
+        // Step 3: Upload to presigned URL
+        const uploadResponse = await fetch(uploadData.uploadUrl, {
+          method: "PUT",
+          headers: {
+            "Content-Type": mimeType,
+          },
+          body: fileBytes.buffer,
+        });
 
-        if (uploadError) {
-          console.error("Upload error:", uploadError);
-          // Clean up local file even on failure to prevent accumulation
+        if (!uploadResponse.ok) {
+          console.error(
+            "Upload to presigned URL failed:",
+            uploadResponse.status
+          );
           deleteLocalFile(uri);
           return { success: false, error: "upload_failed" };
         }
@@ -81,7 +108,7 @@ export function useRecordingUpload(
         // Clean up local file after successful upload to prevent storage accumulation
         deleteLocalFile(uri);
 
-        return { success: true, recordingId };
+        return { success: true, recordingId: uploadData.audioId };
       } catch (error) {
         console.error("Failed to upload recording:", error);
         // Clean up local file even on failure to prevent accumulation
@@ -91,7 +118,7 @@ export function useRecordingUpload(
         setIsUploading(false);
       }
     },
-    [bucketName]
+    [apiUrl]
   );
 
   return {

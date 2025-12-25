@@ -169,7 +169,7 @@ export default function RecordVoiceScreen() {
         // Ignore errors - we're canceling anyway
       }
     }
-    router.dismissTo("/(auth)/home");
+    router.dismissTo("/(auth)/(tabs)/home");
   }, [isCountdownActive, cancelCountdown, phase, stopRecording]);
 
   // Memoize screen options to prevent infinite re-render loop
