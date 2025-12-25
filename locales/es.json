@@ -116,15 +116,23 @@
     "goHome": "Ir al Inicio",
     "duration_too_short": {
       "title": "Grabación Muy Corta",
-      "message": "Tu grabación debe tener al menos 20 segundos para que nuestra IA pueda darte retroalimentación útil. Por favor intenta de nuevo con una grabación más larga."
+      "message": "Por favor graba al menos 20 segundos para que podamos darte retroalimentación útil sobre tu discurso."
     },
     "upload_failed": {
       "title": "Error al Subir",
-      "message": "No pudimos subir tu grabación. Por favor verifica tu conexión a internet e intenta de nuevo."
+      "message": "Tenemos problemas guardando tu grabación. Por favor verifica tu conexión a internet e intenta de nuevo."
+    },
+    "processing_failed": {
+      "title": "Análisis Fallido",
+      "message": "No pudimos analizar tu grabación ahora. No te preocupes, tu grabación está segura. Por favor intenta de nuevo en un momento."
+    },
+    "subscription_error": {
+      "title": "Conexión Perdida",
+      "message": "Perdimos la conexión mientras procesábamos tu grabación. Por favor verifica tu internet e intenta grabar de nuevo."
     },
     "unknown": {
-      "title": "Algo Salió Mal",
-      "message": "Ocurrió un error inesperado. Por favor intenta de nuevo."
+      "title": "Oops, Algo Salió Mal",
+      "message": "Encontramos un problema inesperado. Por favor intenta grabar de nuevo."
     }
   },
   "processingRecording": {

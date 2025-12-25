@@ -8,7 +8,12 @@ import { Text, YStack } from "tamagui";
 
 import { PrimaryButton, SecondaryButton } from "@/components/ui";
 
-type RecordingErrorType = "duration_too_short" | "upload_failed" | "unknown";
+type RecordingErrorType =
+  | "duration_too_short"
+  | "upload_failed"
+  | "processing_failed"
+  | "subscription_error"
+  | "unknown";
 
 interface ErrorConfig {
   icon: keyof typeof Ionicons.glyphMap;
@@ -24,6 +29,14 @@ const ERROR_CONFIGS: Record<RecordingErrorType, ErrorConfig> = {
     icon: "cloud-offline-outline",
     iconColor: "#ef4444",
   },
+  processing_failed: {
+    icon: "server-outline",
+    iconColor: "#ef4444",
+  },
+  subscription_error: {
+    icon: "sync-outline",
+    iconColor: "#ef4444",
+  },
   unknown: {
     icon: "alert-circle-outline",
     iconColor: "#ef4444",
@@ -34,13 +47,41 @@ export default function RecordingErrorScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{
-    errorType: RecordingErrorType;
+    errorType?: RecordingErrorType;
+    error?: string;
     mode?: string;
     type?: string;
   }>();
 
-  const errorType = params.errorType ?? "unknown";
-  const errorConfig = ERROR_CONFIGS[errorType] ?? ERROR_CONFIGS.unknown;
+  // Map error messages to user-friendly error types
+  const getErrorType = (): RecordingErrorType => {
+    if (params.errorType) return params.errorType;
+
+    const errorMessage = params.error?.toLowerCase() || "";
+
+    // Map error messages to types for user-friendly display
+    if (errorMessage.includes("processing")) {
+      return "processing_failed";
+    }
+    if (
+      errorMessage.includes("connect") ||
+      errorMessage.includes("subscription") ||
+      errorMessage.includes("monitor")
+    ) {
+      return "subscription_error";
+    }
+    if (errorMessage.includes("upload")) {
+      return "upload_failed";
+    }
+    if (errorMessage.includes("duration") || errorMessage.includes("short")) {
+      return "duration_too_short";
+    }
+
+    return "unknown";
+  };
+
+  const errorType = getErrorType();
+  const errorConfig = ERROR_CONFIGS[errorType];
 
   const handleTryAgain = () => {
     router.replace({
@@ -53,7 +94,7 @@ export default function RecordingErrorScreen() {
   };
 
   const handleGoHome = () => {
-    router.dismissTo("/(auth)/home");
+    router.dismissTo("/(auth)/(tabs)/home");
   };
 
   return (

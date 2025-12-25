@@ -1,3 +1,4 @@
+import { useAudioProcessing } from "@/hooks/use-audio-processing";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
@@ -21,6 +22,13 @@ export default function ProcessingRecordingScreen() {
     type?: string;
   }>();
 
+  // Subscribe to audio processing updates
+  useAudioProcessing({
+    recordingId: params.recordingId,
+    mode: params.mode,
+    type: params.type,
+  });
+
   // Pulsing animation for the processing indicator
   const pulseOpacity = useSharedValue(0.6);
 
@@ -35,9 +43,6 @@ export default function ProcessingRecordingScreen() {
   const pulseStyle = useAnimatedStyle(() => ({
     opacity: pulseOpacity.value,
   }));
-
-  // TODO: Implement actual processing logic here
-  // This is a mock loading state for now
 
   return (
     <YStack
