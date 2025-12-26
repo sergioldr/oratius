@@ -4,8 +4,13 @@ import {
 } from "@expo-google-fonts/dancing-script";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useCallback, useEffect, useRef } from "react";
+import { getLocales } from "expo-localization";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Animated, Dimensions, StyleSheet, Text, View } from "react-native";
+
+import { useAuth } from "@/context/auth-context";
+import { supabase } from "@/lib/supabase";
+import { useProfileStore } from "@/store/profile-store";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -16,14 +21,67 @@ interface SplashScreenProps {
 /**
  * Custom splash screen component with brand styling.
  * Shows the Dilo logo with animations while app initializes.
+ * Also loads user profile data from Supabase into the global store.
  */
 export function SplashScreen({ onReady }: SplashScreenProps) {
+  const { user } = useAuth();
+  const { setProfile, markAsLoaded } = useProfileStore();
+  const [isProfileLoaded, setIsProfileLoaded] = useState(false);
+
   // Animation values
   const loadingBarPosition = useRef(new Animated.Value(0)).current;
 
   const [dancingScriptLoaded] = useDancingScriptFonts({
     DancingScript_700Bold,
   });
+
+  // Load profile data from Supabase
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (!user) {
+        // No user, mark as loaded with defaults
+        markAsLoaded();
+        setIsProfileLoaded(true);
+        return;
+      }
+
+      try {
+        // Fetch profile data
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("user_id", user.id)
+          .single();
+
+        if (error && error.code !== "PGRST116") {
+          // PGRST116 = no rows found, which is ok
+          console.error("Error loading profile:", error);
+        }
+
+        if (data) {
+          // Update store with profile data
+          setProfile({
+            name: data.display_name || "",
+            speakingRole: data.speaking_role || "",
+            industry: data.industry || "",
+            seniority: data.seniority || "",
+            language: data.language || getInitialLanguage(),
+            goal: data.goal || "sound-confident",
+          });
+        }
+
+        markAsLoaded();
+        setIsProfileLoaded(true);
+      } catch (error) {
+        console.error("Error loading profile:", error);
+        // Still mark as loaded to continue
+        markAsLoaded();
+        setIsProfileLoaded(true);
+      }
+    };
+
+    loadProfile();
+  }, [user, setProfile, markAsLoaded]);
 
   // Start loading bar animation (slides from left to right, exits completely)
   const startLoadingAnimation = useCallback(() => {
@@ -53,12 +111,36 @@ export function SplashScreen({ onReady }: SplashScreenProps) {
     };
   }, [startLoadingAnimation]);
 
-  // Notify when fonts are loaded
+  // Notify when fonts and profile are loaded
   useEffect(() => {
-    if (dancingScriptLoaded) {
+    if (dancingScriptLoaded && isProfileLoaded) {
       onReady?.();
     }
-  }, [dancingScriptLoaded, onReady]);
+  }, [dancingScriptLoaded, isProfileLoaded, onReady]);
+
+  // Helper function to detect device language
+  const getInitialLanguage = (): "en-US" | "en-GB" | "es-ES" => {
+    const deviceLocale = getLocales()[0];
+    const languageTag = deviceLocale?.languageTag;
+
+    if (
+      languageTag === "en-US" ||
+      languageTag === "en-GB" ||
+      languageTag === "es-ES"
+    ) {
+      return languageTag;
+    }
+
+    const languageCode = deviceLocale?.languageCode;
+    if (languageCode === "es") return "es-ES";
+    if (languageCode === "en") {
+      const regionCode = deviceLocale?.regionCode;
+      if (regionCode === "GB") return "en-GB";
+      return "en-US";
+    }
+
+    return "en-US";
+  };
 
   // Interpolate translateX for loading bar (enter from left, exit to right)
   // Bar width is 64, container is 128, so we need to move from -64 to 128

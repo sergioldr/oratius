@@ -61,6 +61,7 @@ interface SelectProps<T extends string> {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   snapPoints?: number[];
+  error?: boolean;
 }
 
 export function Select<T extends string>({
@@ -71,6 +72,7 @@ export function Select<T extends string>({
   open,
   onOpenChange,
   snapPoints = [50],
+  error = false,
 }: SelectProps<T>) {
   const selectedOption = options.find((o) => o.value === value);
 
@@ -82,6 +84,8 @@ export function Select<T extends string>({
         icon="chevron-down"
         iconPosition="right"
         onPress={() => onOpenChange(true)}
+        borderColor={error ? "$red9" : undefined}
+        borderWidth={error ? 2 : undefined}
       >
         {selectedOption?.label || placeholder}
       </SecondaryButton>

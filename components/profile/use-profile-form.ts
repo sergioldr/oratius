@@ -7,13 +7,14 @@ import { useAuth } from "@/context/auth-context";
 import { useAudioPermission } from "@/hooks/use-audio-permission";
 import { useNotificationPermission } from "@/hooks/use-notification-permission";
 import { supabase } from "@/lib/supabase";
+import { useProfileStore } from "@/store/profile-store";
 
 import type { ProfileFormData } from "./types";
 
 /**
  * Custom hook for managing profile form state with Supabase integration
  */
-export function useProfileForm() {
+export function useProfileForm(callbacks?: { onValidationError?: () => void }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { requestPermission } = useAudioPermission();
@@ -21,68 +22,48 @@ export function useProfileForm() {
     permissionGranted: notificationsEnabled,
     togglePermission: toggleNotifications,
   } = useNotificationPermission();
+  const { profile: storeProfile, setProfile: setStoreProfile } =
+    useProfileStore();
 
-  // Form state
+  // Initialize form state from the store
   const [formData, setFormData] = useState<ProfileFormData>({
-    // About You
-    speakingRole: "leadership",
-    industry: "technology",
-    seniority: "senior",
-
-    // Communication
-    speakingContext: "interviews",
-    language: "en-us",
-
-    // Goals
-    goal: "be-concise",
-
-    // Settings
+    name: storeProfile.name,
+    speakingRole: storeProfile.speakingRole,
+    industry: storeProfile.industry,
+    seniority: storeProfile.seniority,
+    language: storeProfile.language,
+    goal: storeProfile.goal,
     notificationsEnabled: false,
     audioPermissionGranted: false,
   });
 
   const [isSaving, setIsSaving] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<{
+    name: boolean;
+    speakingRole: boolean;
+    industry: boolean;
+    seniority: boolean;
+    nameCharacterLimit: boolean;
+  }>({
+    name: false,
+    speakingRole: false,
+    industry: false,
+    seniority: false,
+    nameCharacterLimit: false,
+  });
 
-  // Load profile from Supabase
+  // Sync form data with store when store changes
   useEffect(() => {
-    const loadProfile = async () => {
-      if (!user || user.is_anonymous) return;
-
-      try {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("user_id", user.id)
-          .single();
-
-        if (error && error.code !== "PGRST116") {
-          // PGRST116 = no rows found, which is ok
-          throw error;
-        }
-
-        if (data) {
-          setFormData({
-            speakingRole: data.speaking_role,
-            industry: data.industry,
-            seniority: data.seniority,
-            speakingContext: data.speaking_context,
-            language: data.language,
-            goal: data.goal,
-            notificationsEnabled: data.notifications_enabled,
-            audioPermissionGranted: data.audio_permission_granted,
-          });
-        }
-      } catch (error) {
-        console.error("Error loading profile:", error);
-        Alert.alert(
-          t("profile.alerts.error.title"),
-          t("profile.alerts.error.loadFailed")
-        );
-      }
-    };
-
-    loadProfile();
-  }, [user, t]);
+    setFormData((prev) => ({
+      ...prev,
+      name: storeProfile.name,
+      speakingRole: storeProfile.speakingRole,
+      industry: storeProfile.industry,
+      seniority: storeProfile.seniority,
+      language: storeProfile.language,
+      goal: storeProfile.goal,
+    }));
+  }, [storeProfile]);
 
   // Sync notifications enabled state
   useEffect(() => {
@@ -104,6 +85,19 @@ export function useProfileForm() {
     value: ProfileFormData[K]
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+
+    // Check for name character limit
+    if (field === "name" && typeof value === "string") {
+      const exceedsLimit = value.length > 50;
+      setFieldErrors((prev) => ({
+        ...prev,
+        name: false,
+        nameCharacterLimit: exceedsLimit,
+      }));
+    } else if (field in fieldErrors) {
+      // Clear error for this field if it exists
+      setFieldErrors((prev) => ({ ...prev, [field]: false }));
+    }
   };
 
   // Handle audio permission toggle
@@ -123,7 +117,7 @@ export function useProfileForm() {
 
   // Save profile to Supabase
   const saveProfile = async () => {
-    if (!user || user.is_anonymous) {
+    if (!user) {
       Alert.alert(
         t("profile.alerts.error.title"),
         t("profile.alerts.error.mustBeSignedIn")
@@ -131,26 +125,59 @@ export function useProfileForm() {
       return false;
     }
 
+    // Validate required fields
+    const errors = {
+      name: formData.name.trim() === "",
+      speakingRole: formData.speakingRole === "",
+      industry: formData.industry === "",
+      seniority: formData.seniority === "",
+      nameCharacterLimit: formData.name.length > 50,
+    };
+
+    const hasErrors = Object.values(errors).some((error) => error);
+
+    if (hasErrors) {
+      setFieldErrors(errors);
+      callbacks?.onValidationError?.();
+
+      // Show appropriate error message
+      const errorMessage = errors.nameCharacterLimit
+        ? t("profile.alerts.error.nameCharacterLimit")
+        : t("profile.alerts.error.requiredFields");
+
+      Alert.alert(t("profile.alerts.error.title"), errorMessage);
+      return false;
+    }
+
     setIsSaving(true);
     try {
       const profileData = {
         user_id: user.id,
+        display_name: formData.name.trim().slice(0, 50),
         speaking_role: formData.speakingRole,
         industry: formData.industry,
         seniority: formData.seniority,
-        speaking_context: formData.speakingContext,
         language: formData.language,
         goal: formData.goal,
-        notifications_enabled: formData.notificationsEnabled,
-        audio_permission_granted: formData.audioPermissionGranted,
-        updated_at: new Date().toISOString(),
       };
+
+      console.log("Saving profile data:", profileData);
 
       const { error } = await supabase.from("profiles").upsert(profileData, {
         onConflict: "user_id",
       });
 
       if (error) throw error;
+
+      // Update the store with the saved data
+      setStoreProfile({
+        name: profileData.display_name,
+        speakingRole: profileData.speaking_role,
+        industry: profileData.industry,
+        seniority: profileData.seniority,
+        language: profileData.language,
+        goal: profileData.goal,
+      });
 
       Alert.alert(
         t("profile.alerts.success.title"),
@@ -176,5 +203,6 @@ export function useProfileForm() {
     saveProfile,
     handleAudioPermissionToggle,
     handleNotificationsToggle,
+    fieldErrors,
   };
 }

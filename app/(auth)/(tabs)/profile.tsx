@@ -1,6 +1,7 @@
 import { router } from "expo-router";
+import { useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert } from "react-native";
+import { Alert, View } from "react-native";
 import Animated, {
   useAnimatedScrollHandler,
   useSharedValue,
@@ -9,12 +10,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { XStack, YStack } from "tamagui";
 
 import {
-  AnimatedHeader,
-  GhostButton,
-  HEADER_HEIGHT,
-  PrimaryButton,
-} from "@/components/ui";
-import {
   AboutYouSection,
   CommunicationSection,
   GoalsSection,
@@ -22,6 +17,12 @@ import {
   SettingsSection,
   useProfileForm,
 } from "@/components/profile";
+import {
+  AnimatedHeader,
+  GhostButton,
+  HEADER_HEIGHT,
+  PrimaryButton,
+} from "@/components/ui";
 import { useAuth } from "@/context/auth-context";
 import { supabase } from "@/lib/supabase";
 
@@ -31,6 +32,9 @@ import { supabase } from "@/lib/supabase";
 export default function ProfileScreen() {
   const { t } = useTranslation();
   const { isAnonymous, signOut } = useAuth();
+  const scrollViewRef = useRef<Animated.ScrollView>(null);
+  const aboutYouRef = useRef<View>(null);
+  const insets = useSafeAreaInsets();
 
   // Use the custom hook for form management
   const {
@@ -40,7 +44,25 @@ export default function ProfileScreen() {
     saveProfile,
     handleAudioPermissionToggle,
     handleNotificationsToggle,
-  } = useProfileForm();
+    fieldErrors,
+  } = useProfileForm({
+    onValidationError: () => {
+      // Scroll to About You section when validation fails
+      // Account for safe area and header height
+      aboutYouRef.current?.measureLayout(
+        scrollViewRef.current as any,
+        (x, y) => {
+          // Subtract header height and safe area to position section at top
+          const scrollPosition = y - HEADER_HEIGHT - insets.top - 8;
+          scrollViewRef.current?.scrollTo({
+            y: Math.max(0, scrollPosition),
+            animated: true,
+          });
+        },
+        () => {}
+      );
+    },
+  });
 
   // --- Actions ---
   const handleSignOut = () => {
@@ -115,7 +137,6 @@ export default function ProfileScreen() {
     await saveProfile();
   };
 
-  const insets = useSafeAreaInsets();
   const scrollY = useSharedValue(0);
 
   const scrollHandler = useAnimatedScrollHandler({
@@ -135,6 +156,7 @@ export default function ProfileScreen() {
 
       {/* Scrollable Content */}
       <Animated.ScrollView
+        ref={scrollViewRef}
         onScroll={scrollHandler}
         scrollEventThrottle={16}
         style={{ flex: 1, backgroundColor: "transparent" }}
@@ -150,22 +172,25 @@ export default function ProfileScreen() {
           <ProfileHeroCard isAnonymous={isAnonymous} />
 
           {/* About You Section */}
-          <AboutYouSection
-            speakingRole={formData.speakingRole}
-            industry={formData.industry}
-            seniority={formData.seniority}
-            onSpeakingRoleChange={(value) => updateField("speakingRole", value)}
-            onIndustryChange={(value) => updateField("industry", value)}
-            onSeniorityChange={(value) => updateField("seniority", value)}
-          />
+          <View ref={aboutYouRef}>
+            <AboutYouSection
+              name={formData.name}
+              speakingRole={formData.speakingRole}
+              industry={formData.industry}
+              seniority={formData.seniority}
+              onNameChange={(value) => updateField("name", value)}
+              onSpeakingRoleChange={(value) =>
+                updateField("speakingRole", value)
+              }
+              onIndustryChange={(value) => updateField("industry", value)}
+              onSeniorityChange={(value) => updateField("seniority", value)}
+              errors={fieldErrors}
+            />
+          </View>
 
           {/* Communication Style Section */}
           <CommunicationSection
-            speakingContext={formData.speakingContext}
             language={formData.language}
-            onSpeakingContextChange={(value) =>
-              updateField("speakingContext", value)
-            }
             onLanguageChange={(value) => updateField("language", value)}
           />
 

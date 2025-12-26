@@ -2,6 +2,7 @@ export { AnimatedHeader, HEADER_HEIGHT } from "./animated-header";
 export { Card, type CardProps } from "./card";
 export { FeatureCard } from "./feature-card";
 export { GhostButton } from "./ghost-button";
+export { HeroStreakCard } from "./hero-streak-card";
 export { Icon } from "./icon";
 export { ModeButton } from "./mode-button";
 export { PrimaryButton } from "./primary-button";

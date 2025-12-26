@@ -58,11 +58,14 @@
       "afternoon": "Good afternoon,",
       "evening": "Good evening,"
     },
-    "title": "Ready to speak?",
-    "subtitle": "Choose your focus for today's session.",
+    "title": "Let's prepare for your interview",
     "stats": {
+      "currentStreak": "Current Streak",
       "streak": "Streak",
       "avgScore": "Avg Score",
+      "confidence": "Confidence",
+      "clarity": "Clarity",
+      "structure": "Structure",
       "days": "Days"
     },
     "mode": {
@@ -78,16 +81,15 @@
     },
     "interviewType": {
       "title": "What are you preparing for?",
-      "external": "External Job Interview (new role, headhunter)",
-      "internal": "Internal Promotion / Role Change",
-      "behavioral": "Behavioral / Competency-Based",
-      "technical": "Technical / Case Study",
-      "panel": "Panel / Group Interview",
+      "external": "External Interview",
+      "internal": "Internal Interview",
+      "behavioral": "Behavioral Interview",
+      "technical": "Technical Interview",
+      "panel": "Panel Interview",
       "other": "Other"
     },
     "record": {
-      "title": "Record My Speech",
-      "subtitle": "AI analysis ready in seconds"
+      "title": "Start Interview"
     },
     "tabs": {
       "feedback": "Feedback",
@@ -155,6 +157,10 @@
       "description": "This helps the AI adapt feedback.",
       "registerCta": "Register to save this context."
     },
+    "name": {
+      "title": "Name",
+      "placeholder": "Enter your name"
+    },
     "currentRole": {
       "title": "Current role",
       "ceo": "CEO",
@@ -166,41 +172,33 @@
       "title": "Speaking"
     },
     "speakingRole": {
-      "title": "Speaking role",
-      "placeholder": "Select role",
-      "leadership": "Leadership",
-      "peopleManagement": "People Management",
+      "title": "Role you're interviewing for",
+      "placeholder": "Select a role",
       "engineering": "Engineering",
-      "productProject": "Product / Project",
+      "productProject": "Product Management",
       "sales": "Sales",
-      "marketingPr": "Marketing / PR",
+      "marketingPr": "Marketing",
       "customerSuccess": "Customer Success",
       "support": "Support",
       "operations": "Operations",
-      "financeAccounting": "Finance / Accounting",
+      "financeAccounting": "Finance",
       "consulting": "Consulting",
-      "founder": "Founder",
-      "hrRecruiting": "HR / Recruiting",
-      "educationTraining": "Education / Training",
-      "researchAcademia": "Research / Academia",
+      "hrRecruiting": "HR and Recruiting",
+      "educationTraining": "Education",
+      "researchAcademia": "Research",
       "healthcare": "Healthcare",
       "legal": "Legal",
       "publicSector": "Public Sector",
+      "peopleManagement": "People Management",
+      "leadership": "Leadership",
+      "founder": "Founder",
       "creator": "Creator",
       "other": "Other",
       "preferNot": "Prefer not to say"
     },
-    "speakingContext": {
-      "title": "Primary speaking context",
-      "placeholder": "Select context",
-      "executiveMeetings": "Executive meetings",
-      "interviews": "Interviews",
-      "pitches": "Pitches",
-      "dailyTeam": "Daily team"
-    },
     "industry": {
       "title": "Industry",
-      "placeholder": "Select industry",
+      "placeholder": "Select an industry",
       "technology": "Technology",
       "finance": "Finance",
       "consulting": "Consulting",
@@ -214,11 +212,11 @@
       "other": "Other"
     },
     "seniority": {
-      "title": "Seniority",
-      "placeholder": "Select seniority",
+      "title": "Role level",
+      "placeholder": "Select a level",
+      "emerging": "Entry level",
       "junior": "Junior",
-      "emerging": "Emerging",
-      "midLevel": "Mid-level",
+      "midLevel": "Mid level",
       "senior": "Senior",
       "manager": "Manager",
       "director": "Director",
@@ -238,11 +236,9 @@
     },
     "goals": {
       "title": "What matters most right now",
-      "description": "We'll prioritize this in your feedback.",
       "signUpCta": "Sign up to save progress.",
       "soundConfident": "Sound more confident",
       "beConcise": "Be more concise",
-      "executivePresence": "Improve executive presence",
       "toughQuestions": "Handle tough questions"
     },
     "settings": {
@@ -288,7 +284,9 @@
         "deleteAccountFailed": "Failed to delete account. Please try again or contact support.",
         "mustBeSignedIn": "You must be signed in to save your profile.",
         "saveFailed": "Failed to save profile. Please try again.",
-        "loadFailed": "Failed to load profile. Please try again."
+        "loadFailed": "Failed to load profile. Please try again.",
+        "requiredFields": "Please complete all required fields: Name, Role, Industry, and Level.",
+        "nameCharacterLimit": "Name must be 50 characters or less."
       }
     }
   }

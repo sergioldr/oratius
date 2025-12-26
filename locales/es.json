@@ -58,8 +58,7 @@
       "afternoon": "Buenas tardes,",
       "evening": "Buenas noches,"
     },
-    "title": "¿Listo para hablar?",
-    "subtitle": "Elige tu enfoque para la sesión de hoy.",
+    "title": "Comienza a preparar tu entrevista",
     "stats": {
       "streak": "Racha",
       "avgScore": "Puntaje Prom.",
@@ -78,16 +77,15 @@
     },
     "interviewType": {
       "title": "¿Para qué te estás preparando?",
-      "external": "Entrevista Externa (nuevo rol, headhunter)",
-      "internal": "Promoción Interna / Cambio de Rol",
-      "behavioral": "Conductual / Basada en Competencias",
-      "technical": "Técnica / Caso de Estudio",
-      "panel": "Panel / Entrevista Grupal",
+      "external": "Entrevista Externa",
+      "internal": "Entrevista Interna",
+      "behavioral": "Entrevista Conductual",
+      "technical": "Entrevista Técnica",
+      "panel": "Entrevista de Panel",
       "other": "Otro"
     },
     "record": {
-      "title": "Grabar Mi Discurso",
-      "subtitle": "Análisis de IA listo en segundos"
+      "title": "Comenzar Entrevista"
     },
     "tabs": {
       "feedback": "Feedback",
@@ -155,6 +153,10 @@
       "description": "Esto ayuda a la IA a adaptar la retroalimentación.",
       "registerCta": "Regístrate para guardar este contexto."
     },
+    "name": {
+      "title": "Nombre",
+      "placeholder": "Ingresa tu nombre"
+    },
     "currentRole": {
       "title": "Rol actual",
       "ceo": "CEO",
@@ -189,14 +191,6 @@
       "creator": "Creador",
       "other": "Otro",
       "preferNot": "Prefiero no decirlo"
-    },
-    "speakingContext": {
-      "title": "Contexto principal de habla",
-      "placeholder": "Seleccionar contexto",
-      "executiveMeetings": "Reuniones ejecutivas",
-      "interviews": "Entrevistas",
-      "pitches": "Presentaciones",
-      "dailyTeam": "Equipo diario"
     },
     "industry": {
       "title": "Industria",
@@ -238,11 +232,9 @@
     },
     "goals": {
       "title": "Lo que más importa ahora",
-      "description": "Priorizaremos esto en tu retroalimentación.",
       "signUpCta": "Regístrate para guardar tu progreso.",
       "soundConfident": "Sonar más seguro",
       "beConcise": "Ser más conciso",
-      "executivePresence": "Mejorar presencia ejecutiva",
       "toughQuestions": "Manejar preguntas difíciles"
     },
     "settings": {
@@ -280,7 +272,9 @@
       "error": {
         "title": "Error",
         "signOutFailed": "No se pudo cerrar sesión. Por favor, inténtalo de nuevo.",
-        "deleteAccountFailed": "No se pudo eliminar la cuenta. Por favor, inténtalo de nuevo o contacta soporte."
+        "deleteAccountFailed": "No se pudo eliminar la cuenta. Por favor, inténtalo de nuevo o contacta soporte.",
+        "requiredFields": "Por favor, completa todos los campos requeridos: Nombre, Rol, Industria y Nivel.",
+        "nameCharacterLimit": "El nombre debe tener 50 caracteres o menos."
       }
     }
   }

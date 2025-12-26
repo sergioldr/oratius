@@ -3,17 +3,16 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ScrollView, Text, XStack, YStack } from "tamagui";
+import { Text, XStack, YStack } from "tamagui";
 
 import { Iridescence } from "@/components/iridescence";
 import { PulsingMicButton } from "@/components/pulsing-mic-button";
-import { ModeButton, Select, StatCard } from "@/components/ui";
+import { HeroStreakCard, Select, StatCard } from "@/components/ui";
 import { useUser } from "@/context/user-context";
 import { useAudioPermission } from "@/hooks/use-audio-permission";
 import { useAuthMe } from "@/hooks/use-auth-me";
+import { useProfileStore } from "@/store/profile-store";
 
-type Mode = "pitch" | "interview";
-type PitchType = "startup" | "product" | "yourself";
 type InterviewType =
   | "external"
   | "internal"
@@ -32,10 +31,9 @@ function getGreeting(t: (key: string) => string): string {
 export default function HomeScreen() {
   const { t } = useTranslation();
   const { userData } = useUser();
+  const { profile } = useProfileStore();
   const insets = useSafeAreaInsets();
 
-  const [mode, setMode] = useState<Mode>("pitch");
-  const [pitchType, setPitchType] = useState<PitchType>("startup");
   const [interviewType, setInterviewType] = useState<InterviewType>("external");
   const [selectOpen, setSelectOpen] = useState(false);
 
@@ -47,13 +45,15 @@ export default function HomeScreen() {
   // Mock stats - would come from user data
   const streak = 3;
   const avgScore = 8.5;
+  const confidence = "High";
+  const clarity = 92;
+  const structure = "Solid";
 
   const handleRecordPress = async () => {
     const hasPermission = await requestPermission();
 
     if (hasPermission) {
-      const currentType = mode === "pitch" ? pitchType : interviewType;
-      router.push(`/record-voice?mode=${mode}&type=${currentType}` as Href);
+      router.push(`/record-voice?mode=interview&type=${interviewType}` as Href);
     }
   };
 
@@ -68,14 +68,16 @@ export default function HomeScreen() {
 
   return (
     <YStack flex={1} backgroundColor="$backgroundStrong">
-      <ScrollView
+      <YStack
         flex={1}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}
+        paddingHorizontal="$4"
+        paddingTop={insets.top + 8}
+        paddingBottom={Math.max(insets.bottom, 20) + 80}
+        justifyContent="space-between"
       >
-        <YStack flex={1} paddingHorizontal="$5" paddingTop={insets.top + 12}>
+        <YStack flex={1}>
           {/* Header */}
-          <XStack alignItems="center" gap="$3" marginBottom="$6">
+          <XStack alignItems="center" gap="$2" marginBottom="$3">
             <View style={styles.iridescenceContainer}>
               <Iridescence
                 amplitude={0.5}
@@ -84,157 +86,111 @@ export default function HomeScreen() {
               />
             </View>
             <YStack>
-              <Text fontSize="$3" fontWeight="500" color="$gray11">
+              <Text fontSize="$2" fontWeight="500" color="$gray11">
                 {getGreeting(t)}
               </Text>
-              <Text fontSize="$5" fontWeight="700" color="$color">
-                {userData.name || "Alex"}
+              <Text fontSize="$4" fontWeight="700" color="$color">
+                {profile.name || "Alex"}
               </Text>
             </YStack>
           </XStack>
 
           {/* Title Section */}
-          <YStack marginBottom="$6">
+          <YStack marginTop="$3" marginBottom="$3">
             <Text
-              fontSize={32}
+              fontSize={26}
               fontWeight="700"
               color="$color"
-              lineHeight={38}
+              lineHeight={32}
               letterSpacing={-0.5}
             >
               {t("home.title")}
             </Text>
-            <Text fontSize="$4" color="$gray11" marginTop="$2">
-              {t("home.subtitle")}
-            </Text>
           </YStack>
 
-          {/* Stats Row */}
-          <XStack gap="$3" marginBottom="$6">
-            <StatCard
-              icon="flame"
-              iconColor="#22c55e"
-              iconBgColor="rgba(34, 197, 94, 0.15)"
-              label={t("home.stats.streak")}
-              value={`${streak} ${t("home.stats.days")}`}
+          {/* Hero Streak Card */}
+          <YStack marginBottom="$3">
+            <HeroStreakCard
+              streak={streak}
+              label={t("home.stats.currentStreak")}
+              daysLabel={t("home.stats.days")}
             />
-            <StatCard
-              icon="analytics"
-              iconColor="#a855f7"
-              iconBgColor="rgba(168, 85, 247, 0.15)"
-              label={t("home.stats.avgScore")}
-              value={`${avgScore}/10`}
-            />
-          </XStack>
+          </YStack>
 
-          {/* Mode Selection */}
-          <YStack marginBottom="$6">
-            <Text
-              fontSize="$2"
-              fontWeight="600"
-              color="$color"
-              marginBottom="$3"
-              textTransform="uppercase"
-              letterSpacing={1}
-              opacity={0.8}
-            >
-              {t("home.mode.title")}
-            </Text>
-            <XStack gap="$3" flexWrap="wrap">
-              <ModeButton
-                label={t("home.mode.pitch")}
-                selected={mode === "pitch"}
-                onPress={() => setMode("pitch")}
+          {/* Stats Grid */}
+          <YStack gap="$2" marginBottom="$3">
+            <XStack gap="$2">
+              <StatCard
+                icon="analytics"
+                iconColor="#a855f7"
+                iconBgColor="rgba(168, 85, 247, 0.15)"
+                label={t("home.stats.avgScore")}
+                value={`${avgScore}/10`}
               />
-              <ModeButton
-                label={t("home.mode.interview")}
-                selected={mode === "interview"}
-                onPress={() => setMode("interview")}
+              <StatCard
+                icon="happy"
+                iconColor="#3b82f6"
+                iconBgColor="rgba(59, 130, 246, 0.15)"
+                label={t("home.stats.confidence")}
+                value={confidence}
+              />
+            </XStack>
+            <XStack gap="$2">
+              <StatCard
+                icon="pulse"
+                iconColor="#f59e0b"
+                iconBgColor="rgba(245, 158, 11, 0.15)"
+                label={t("home.stats.clarity")}
+                value={`${clarity}%`}
+              />
+              <StatCard
+                icon="document-text"
+                iconColor="#8b5cf6"
+                iconBgColor="rgba(139, 92, 246, 0.15)"
+                label={t("home.stats.structure")}
+                value={structure}
               />
             </XStack>
           </YStack>
 
-          {/* Conditional Options Based on Mode */}
-          {mode === "pitch" ? (
-            <YStack marginBottom="$4">
-              <Text
-                fontSize="$2"
-                fontWeight="600"
-                color="$color"
-                marginBottom="$3"
-                textTransform="uppercase"
-                letterSpacing={1}
-                opacity={0.8}
-              >
-                {t("home.pitchAbout.title")}
-              </Text>
-              <XStack gap="$3" flexWrap="wrap">
-                <ModeButton
-                  label={t("home.pitchAbout.startup")}
-                  selected={pitchType === "startup"}
-                  onPress={() => setPitchType("startup")}
-                />
-                <ModeButton
-                  label={t("home.pitchAbout.product")}
-                  selected={pitchType === "product"}
-                  onPress={() => setPitchType("product")}
-                />
-                <ModeButton
-                  label={t("home.pitchAbout.yourself")}
-                  selected={pitchType === "yourself"}
-                  onPress={() => setPitchType("yourself")}
-                />
-              </XStack>
-            </YStack>
-          ) : (
-            <YStack marginBottom="$4">
-              <Text
-                fontSize="$2"
-                fontWeight="600"
-                color="$color"
-                marginBottom="$3"
-                textTransform="uppercase"
-                letterSpacing={1}
-                opacity={0.8}
-              >
-                {t("home.interviewType.title")}
-              </Text>
-              <Select
-                value={interviewType}
-                options={interviewOptions}
-                onValueChange={setInterviewType}
-                open={selectOpen}
-                onOpenChange={setSelectOpen}
-              />
-            </YStack>
-          )}
-        </YStack>
-
-        {/* Record Button Section - Pushed to bottom */}
-        <YStack
-          alignItems="center"
-          paddingVertical="$8"
-          paddingBottom="$10"
-          marginTop="auto"
-          paddingHorizontal="$5"
-        >
-          <PulsingMicButton onPress={handleRecordPress} />
-          <YStack alignItems="center" marginTop="$4">
-            <Text fontSize="$5" fontWeight="700" color="$color">
-              {t("home.record.title")}
-            </Text>
+          {/* Interview Type Selection */}
+          <YStack marginTop="$3" marginBottom="$3">
             <Text
               fontSize="$1"
-              color="$gray11"
-              marginTop="$1"
-              fontWeight="500"
-              letterSpacing={0.5}
+              fontWeight="600"
+              color="$color"
+              marginBottom="$2"
+              letterSpacing={1}
+              opacity={0.8}
             >
-              {t("home.record.subtitle")}
+              {t("home.interviewType.title")}
+            </Text>
+            <Select
+              value={interviewType}
+              options={interviewOptions}
+              onValueChange={setInterviewType}
+              open={selectOpen}
+              onOpenChange={setSelectOpen}
+            />
+          </YStack>
+        </YStack>
+
+        {/* Record Button Section */}
+        <YStack alignItems="center" marginTop="$4">
+          <PulsingMicButton onPress={handleRecordPress} />
+          <YStack alignItems="center" marginTop="$4">
+            <Text
+              fontSize="$1"
+              fontWeight="600"
+              color="$color"
+              letterSpacing={1}
+              opacity={0.8}
+            >
+              {t("home.record.title")}
             </Text>
           </YStack>
         </YStack>
-      </ScrollView>
+      </YStack>
     </YStack>
   );
 }

@@ -3,6 +3,7 @@
  */
 
 export type SpeakingRole =
+  | ""
   | "leadership"
   | "people-management"
   | "engineering"
@@ -25,13 +26,8 @@ export type SpeakingRole =
   | "other"
   | "prefer-not";
 
-export type SpeakingContext =
-  | "executive-meetings"
-  | "interviews"
-  | "pitches"
-  | "daily-team";
-
 export type Industry =
+  | ""
   | "technology"
   | "finance"
   | "consulting"
@@ -45,6 +41,7 @@ export type Industry =
   | "other";
 
 export type Seniority =
+  | ""
   | "junior"
   | "emerging"
   | "mid-level"
@@ -55,23 +52,19 @@ export type Seniority =
 
 export type Language = "en-US" | "en-GB" | "es-ES";
 
-export type Goal =
-  | "sound-confident"
-  | "be-concise"
-  | "executive-presence"
-  | "tough-questions";
+export type Goal = "sound-confident" | "be-concise" | "tough-questions";
 
 /**
  * Complete profile form data structure
  */
 export interface ProfileFormData {
   // About You
+  name: string;
   speakingRole: SpeakingRole;
   industry: Industry;
   seniority: Seniority;
 
   // Communication
-  speakingContext: SpeakingContext;
   language: Language;
 
   // Goals

@@ -7818,8 +7818,10 @@ __metadata:
     react-native-svg: "npm:15.12.1"
     react-native-web: "npm:~0.21.2"
     react-native-worklets: "npm:0.5.1"
+    react-tracked: "npm:2.0.1"
     tamagui: "npm:1.139.1"
     typescript: "npm:~5.9.3"
+    zustand: "npm:5.0.9"
   languageName: unknown
   linkType: soft
 
@@ -11091,6 +11093,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"proxy-compare@npm:^3.0.0":
+  version: 3.0.1
+  resolution: "proxy-compare@npm:3.0.1"
+  checksum: 10c0/1e3631ef32603d4de263860ce02d84b48384dce9b62238b2148b3c58a4e4ec5b06644615dcc196a339f73b9695443317099d55a9173e02ce8492088c9330c00b
+  languageName: node
+  linkType: hard
+
 "punycode@npm:^2.1.0, punycode@npm:^2.1.1":
   version: 2.3.1
   resolution: "punycode@npm:2.3.1"
@@ -11469,6 +11478,19 @@ __metadata:
     "@types/react":
       optional: true
   checksum: 10c0/841938ff16d16a6b76895f4cb2e1fea957e5fe3b30febbf03a54892dae1c9153f2383e231dea0b3ba41192ad2f2849448fa859caccd288943bce32639e971bee
+  languageName: node
+  linkType: hard
+
+"react-tracked@npm:2.0.1":
+  version: 2.0.1
+  resolution: "react-tracked@npm:2.0.1"
+  dependencies:
+    proxy-compare: "npm:^3.0.0"
+    use-context-selector: "npm:^2.0.0"
+  peerDependencies:
+    react: ">=18.0.0"
+    scheduler: ">=0.19.0"
+  checksum: 10c0/3f4213d475532c2ee668a65164f66bf2314f1a9ec2f917f45d306fc7171b3c8bab306fb8a68092c264518e1f81c43c382604e1535de160095ae0d6ea21bf29dc
   languageName: node
   linkType: hard
 
@@ -13060,6 +13082,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"use-context-selector@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "use-context-selector@npm:2.0.0"
+  peerDependencies:
+    react: ">=18.0.0"
+    scheduler: ">=0.19.0"
+  checksum: 10c0/4eb6054ab8996ae8b3f87f9d102e576066e5a8b9db5db2c891128ae920bd64bcdcb4e93a13bc99658ef16280929a8331fc8ac45177f4acd716c425b1bc31135a
+  languageName: node
+  linkType: hard
+
 "use-latest-callback@npm:^0.2.1, use-latest-callback@npm:^0.2.3, use-latest-callback@npm:^0.2.4":
   version: 0.2.6
   resolution: "use-latest-callback@npm:0.2.6"
@@ -13505,5 +13537,26 @@ __metadata:
   version: 0.1.0
   resolution: "yocto-queue@npm:0.1.0"
   checksum: 10c0/dceb44c28578b31641e13695d200d34ec4ab3966a5729814d5445b194933c096b7ced71494ce53a0e8820685d1d010df8b2422e5bf2cdea7e469d97ffbea306f
+  languageName: node
+  linkType: hard
+
+"zustand@npm:5.0.9":
+  version: 5.0.9
+  resolution: "zustand@npm:5.0.9"
+  peerDependencies:
+    "@types/react": ">=18.0.0"
+    immer: ">=9.0.6"
+    react: ">=18.0.0"
+    use-sync-external-store: ">=1.2.0"
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    immer:
+      optional: true
+    react:
+      optional: true
+    use-sync-external-store:
+      optional: true
+  checksum: 10c0/552849e4546c7760704d6509a5c412d57c62a1fa9e53169c939ba5e3d75f8cb3df50a64c3a22e6c3f1c8cc00de7543e4edd61ab5ae0c9169ba9a98e28303aba6
   languageName: node
   linkType: hard

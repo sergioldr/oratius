@@ -3,29 +3,41 @@ import { useTranslation } from "react-i18next";
 import { Alert, Pressable } from "react-native";
 import { Text, XStack, YStack } from "tamagui";
 
-import { Card, Select } from "@/components/ui";
+import { Card, Select, TextInput } from "@/components/ui";
 
 import type { Industry, Seniority, SpeakingRole } from "./types";
 
 interface AboutYouSectionProps {
+  name: string;
   speakingRole: SpeakingRole;
   industry: Industry;
   seniority: Seniority;
+  onNameChange: (value: string) => void;
   onSpeakingRoleChange: (value: SpeakingRole) => void;
   onIndustryChange: (value: Industry) => void;
   onSeniorityChange: (value: Seniority) => void;
+  errors?: {
+    name?: boolean;
+    speakingRole?: boolean;
+    industry?: boolean;
+    seniority?: boolean;
+    nameCharacterLimit?: boolean;
+  };
 }
 
 /**
- * About You section with role, industry, and seniority selection
+ * About You section with name, role, industry, and seniority selection
  */
 export function AboutYouSection({
+  name,
   speakingRole,
   industry,
   seniority,
+  onNameChange,
   onSpeakingRoleChange,
   onIndustryChange,
   onSeniorityChange,
+  errors,
 }: AboutYouSectionProps) {
   const { t } = useTranslation();
 
@@ -34,11 +46,6 @@ export function AboutYouSection({
   const [senioritySheetOpen, setSenioritySheetOpen] = useState(false);
 
   const SPEAKING_ROLES: { value: SpeakingRole; label: string }[] = [
-    { value: "leadership", label: t("profile.speakingRole.leadership") },
-    {
-      value: "people-management",
-      label: t("profile.speakingRole.peopleManagement"),
-    },
     { value: "engineering", label: t("profile.speakingRole.engineering") },
     {
       value: "product-project",
@@ -57,8 +64,9 @@ export function AboutYouSection({
       label: t("profile.speakingRole.financeAccounting"),
     },
     { value: "consulting", label: t("profile.speakingRole.consulting") },
-    { value: "founder", label: t("profile.speakingRole.founder") },
     { value: "hr-recruiting", label: t("profile.speakingRole.hrRecruiting") },
+    { value: "healthcare", label: t("profile.speakingRole.healthcare") },
+    { value: "legal", label: t("profile.speakingRole.legal") },
     {
       value: "education-training",
       label: t("profile.speakingRole.educationTraining"),
@@ -67,9 +75,13 @@ export function AboutYouSection({
       value: "research-academia",
       label: t("profile.speakingRole.researchAcademia"),
     },
-    { value: "healthcare", label: t("profile.speakingRole.healthcare") },
-    { value: "legal", label: t("profile.speakingRole.legal") },
     { value: "public-sector", label: t("profile.speakingRole.publicSector") },
+    {
+      value: "people-management",
+      label: t("profile.speakingRole.peopleManagement"),
+    },
+    { value: "leadership", label: t("profile.speakingRole.leadership") },
+    { value: "founder", label: t("profile.speakingRole.founder") },
     { value: "creator", label: t("profile.speakingRole.creator") },
     { value: "other", label: t("profile.speakingRole.other") },
     { value: "prefer-not", label: t("profile.speakingRole.preferNot") },
@@ -78,20 +90,20 @@ export function AboutYouSection({
   const INDUSTRIES: { value: Industry; label: string }[] = [
     { value: "technology", label: t("profile.industry.technology") },
     { value: "finance", label: t("profile.industry.finance") },
-    { value: "consulting", label: t("profile.industry.consulting") },
     { value: "healthcare", label: t("profile.industry.healthcare") },
+    { value: "retail", label: t("profile.industry.retail") },
+    { value: "manufacturing", label: t("profile.industry.manufacturing") },
+    { value: "consulting", label: t("profile.industry.consulting") },
+    { value: "media", label: t("profile.industry.media") },
     { value: "education", label: t("profile.industry.education") },
     { value: "government", label: t("profile.industry.government") },
-    { value: "manufacturing", label: t("profile.industry.manufacturing") },
-    { value: "retail", label: t("profile.industry.retail") },
-    { value: "media", label: t("profile.industry.media") },
     { value: "nonprofit", label: t("profile.industry.nonprofit") },
     { value: "other", label: t("profile.industry.other") },
   ];
 
   const SENIORITIES: { value: Seniority; label: string }[] = [
-    { value: "junior", label: t("profile.seniority.junior") },
     { value: "emerging", label: t("profile.seniority.emerging") },
+    { value: "junior", label: t("profile.seniority.junior") },
     { value: "mid-level", label: t("profile.seniority.midLevel") },
     { value: "senior", label: t("profile.seniority.senior") },
     { value: "manager", label: t("profile.seniority.manager") },
@@ -121,13 +133,38 @@ export function AboutYouSection({
       </XStack>
 
       <Card variant="elevated" padding="$4" gap="$4">
+        {/* Name */}
+        <YStack gap="$2">
+          <Text
+            fontSize={11}
+            fontWeight="600"
+            color="$color"
+            letterSpacing={0.5}
+          >
+            {t("profile.name.title")}
+          </Text>
+          <TextInput
+            value={name}
+            onChangeText={onNameChange}
+            placeholder={t("profile.name.placeholder")}
+            maxLength={60}
+            autoCapitalize="words"
+            autoComplete="name"
+            error={errors?.name || errors?.nameCharacterLimit}
+          />
+          {errors?.nameCharacterLimit && (
+            <Text fontSize={11} color="$red9" fontWeight="500" marginTop="$1">
+              {t("profile.alerts.error.nameCharacterLimit")}
+            </Text>
+          )}
+        </YStack>
+
         {/* Speaking Role */}
         <YStack gap="$2">
           <Text
             fontSize={11}
             fontWeight="600"
             color="$color"
-            textTransform="uppercase"
             letterSpacing={0.5}
           >
             {t("profile.speakingRole.title")}
@@ -141,6 +178,7 @@ export function AboutYouSection({
             open={speakingRoleSheetOpen}
             onOpenChange={setSpeakingRoleSheetOpen}
             snapPoints={[75]}
+            error={errors?.speakingRole}
           />
         </YStack>
 
@@ -154,6 +192,7 @@ export function AboutYouSection({
               placeholder={t("profile.industry.placeholder")}
               open={industrySheetOpen}
               onOpenChange={setIndustrySheetOpen}
+              error={errors?.industry}
             />
           </YStack>
           <YStack flex={1} gap="$2">
@@ -164,6 +203,7 @@ export function AboutYouSection({
               placeholder={t("profile.seniority.placeholder")}
               open={senioritySheetOpen}
               onOpenChange={setSenioritySheetOpen}
+              error={errors?.seniority}
             />
           </YStack>
         </XStack>
