@@ -10,6 +10,7 @@ import {
 } from "react";
 import { Platform } from "react-native";
 
+import { logger } from "@/lib/logger";
 import { supabase } from "@/lib/supabase";
 
 // Lazy import Google Sign-In to prevent crash in Expo Go
@@ -29,7 +30,8 @@ try {
   GoogleSignin = googleSignIn.GoogleSignin;
   isSuccessResponse = googleSignIn.isSuccessResponse;
 } catch {
-  console.log(
+  logger.info(
+    "Auth",
     "Google Sign-In native module not available. This is expected in Expo Go."
   );
 }
@@ -63,7 +65,7 @@ function configureGoogleSignIn() {
     });
     googleSignInConfigured = true;
   } catch (error) {
-    console.error("Failed to configure Google Sign-In:", error);
+    logger.error("Auth", "Failed to configure Google Sign-In", { error });
   }
 }
 
@@ -143,10 +145,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         error.code === "ERR_REQUEST_CANCELED"
       ) {
         // User canceled the sign-in flow - this is not an error
-        console.log("Apple Sign-In canceled by user");
+        logger.debug("Auth", "Apple Sign-In canceled by user");
         return;
       }
-      console.error("Apple Sign-In error:", error);
+      logger.error("Auth", "Apple Sign-In error", { error });
       throw error;
     }
   }, []);
@@ -163,7 +165,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw error;
       }
     } catch (error) {
-      console.error("Anonymous Sign-In error:", error);
+      logger.error("Auth", "Anonymous Sign-In error", { error });
       throw error;
     }
   }, []);
@@ -208,7 +210,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } else {
         // User canceled or sign-in was not successful
-        console.log("Google Sign-In was not successful");
+        logger.warn("Auth", "Google Sign-In was not successful");
       }
     } catch (error: unknown) {
       // Handle specific Google Sign-In errors
@@ -218,11 +220,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           errorCode === "SIGN_IN_CANCELLED" ||
           errorCode === "12501" // Android cancel code
         ) {
-          console.log("Google Sign-In canceled by user");
+          logger.debug("Auth", "Google Sign-In canceled by user");
           return;
         }
       }
-      console.error("Google Sign-In error:", error);
+      logger.error("Auth", "Google Sign-In error", { error });
       throw error;
     }
   }, []);
@@ -249,7 +251,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw error;
       }
     } catch (error) {
-      console.error("Magic Link error:", error);
+      logger.error("Auth", "Magic Link error", { error });
       throw error;
     }
   }, []);
@@ -278,7 +280,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw error;
       }
     } catch (error) {
-      console.error("Sign out error:", error);
+      logger.error("Auth", "Sign out error", { error });
       throw error;
     }
   }, []);

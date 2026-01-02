@@ -6,6 +6,7 @@ import { Alert } from "react-native";
 import { useAuth } from "@/context/auth-context";
 import { useAudioPermission } from "@/hooks/use-audio-permission";
 import { useNotificationPermission } from "@/hooks/use-notification-permission";
+import { logger } from "@/lib/logger";
 import { supabase } from "@/lib/supabase";
 import { useProfileStore } from "@/store/profile-store";
 
@@ -28,7 +29,7 @@ export function useProfileForm(callbacks?: { onValidationError?: () => void }) {
   // Initialize form state from the store
   const [formData, setFormData] = useState<ProfileFormData>({
     name: storeProfile.name,
-    speakingRole: storeProfile.speakingRole,
+    jobRole: storeProfile.jobRole,
     industry: storeProfile.industry,
     seniority: storeProfile.seniority,
     language: storeProfile.language,
@@ -40,13 +41,13 @@ export function useProfileForm(callbacks?: { onValidationError?: () => void }) {
   const [isSaving, setIsSaving] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{
     name: boolean;
-    speakingRole: boolean;
+    jobRole: boolean;
     industry: boolean;
     seniority: boolean;
     nameCharacterLimit: boolean;
   }>({
     name: false,
-    speakingRole: false,
+    jobRole: false,
     industry: false,
     seniority: false,
     nameCharacterLimit: false,
@@ -57,7 +58,7 @@ export function useProfileForm(callbacks?: { onValidationError?: () => void }) {
     setFormData((prev) => ({
       ...prev,
       name: storeProfile.name,
-      speakingRole: storeProfile.speakingRole,
+      jobRole: storeProfile.jobRole,
       industry: storeProfile.industry,
       seniority: storeProfile.seniority,
       language: storeProfile.language,
@@ -128,7 +129,7 @@ export function useProfileForm(callbacks?: { onValidationError?: () => void }) {
     // Validate required fields
     const errors = {
       name: formData.name.trim() === "",
-      speakingRole: formData.speakingRole === "",
+      jobRole: formData.jobRole === "",
       industry: formData.industry === "",
       seniority: formData.seniority === "",
       nameCharacterLimit: formData.name.length > 50,
@@ -154,14 +155,14 @@ export function useProfileForm(callbacks?: { onValidationError?: () => void }) {
       const profileData = {
         user_id: user.id,
         display_name: formData.name.trim().slice(0, 50),
-        speaking_role: formData.speakingRole,
+        role: formData.jobRole,
         industry: formData.industry,
         seniority: formData.seniority,
         language: formData.language,
         goal: formData.goal,
       };
 
-      console.log("Saving profile data:", profileData);
+      logger.info("useProfileForm", "Saving profile data", { profileData });
 
       const { error } = await supabase.from("profiles").upsert(profileData, {
         onConflict: "user_id",
@@ -172,7 +173,7 @@ export function useProfileForm(callbacks?: { onValidationError?: () => void }) {
       // Update the store with the saved data
       setStoreProfile({
         name: profileData.display_name,
-        speakingRole: profileData.speaking_role,
+        jobRole: profileData.role,
         industry: profileData.industry,
         seniority: profileData.seniority,
         language: profileData.language,
@@ -185,7 +186,7 @@ export function useProfileForm(callbacks?: { onValidationError?: () => void }) {
       );
       return true;
     } catch (error) {
-      console.error("Error saving profile:", error);
+      logger.error("useProfileForm", "Error saving profile", { error });
       Alert.alert(
         t("profile.alerts.error.title"),
         t("profile.alerts.error.saveFailed")

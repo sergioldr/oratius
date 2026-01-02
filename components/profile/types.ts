@@ -2,7 +2,7 @@
  * Profile form types and interfaces
  */
 
-export type SpeakingRole =
+export type JobRole =
   | ""
   | "leadership"
   | "people-management"
@@ -60,7 +60,7 @@ export type Goal = "sound-confident" | "be-concise" | "tough-questions";
 export interface ProfileFormData {
   // About You
   name: string;
-  speakingRole: SpeakingRole;
+  jobRole: JobRole;
   industry: Industry;
   seniority: Seniority;
 

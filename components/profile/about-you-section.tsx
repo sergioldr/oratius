@@ -5,20 +5,20 @@ import { Text, XStack, YStack } from "tamagui";
 
 import { Card, Select, TextInput } from "@/components/ui";
 
-import type { Industry, Seniority, SpeakingRole } from "./types";
+import type { Industry, JobRole, Seniority } from "./types";
 
 interface AboutYouSectionProps {
   name: string;
-  speakingRole: SpeakingRole;
+  jobRole: JobRole;
   industry: Industry;
   seniority: Seniority;
   onNameChange: (value: string) => void;
-  onSpeakingRoleChange: (value: SpeakingRole) => void;
+  onJobRoleChange: (value: JobRole) => void;
   onIndustryChange: (value: Industry) => void;
   onSeniorityChange: (value: Seniority) => void;
   errors?: {
     name?: boolean;
-    speakingRole?: boolean;
+    jobRole?: boolean;
     industry?: boolean;
     seniority?: boolean;
     nameCharacterLimit?: boolean;
@@ -30,61 +30,61 @@ interface AboutYouSectionProps {
  */
 export function AboutYouSection({
   name,
-  speakingRole,
+  jobRole,
   industry,
   seniority,
   onNameChange,
-  onSpeakingRoleChange,
+  onJobRoleChange,
   onIndustryChange,
   onSeniorityChange,
   errors,
 }: AboutYouSectionProps) {
   const { t } = useTranslation();
 
-  const [speakingRoleSheetOpen, setSpeakingRoleSheetOpen] = useState(false);
+  const [jobRoleSheetOpen, setJobRoleSheetOpen] = useState(false);
   const [industrySheetOpen, setIndustrySheetOpen] = useState(false);
   const [senioritySheetOpen, setSenioritySheetOpen] = useState(false);
 
-  const SPEAKING_ROLES: { value: SpeakingRole; label: string }[] = [
-    { value: "engineering", label: t("profile.speakingRole.engineering") },
+  const JOB_ROLES: { value: JobRole; label: string }[] = [
+    { value: "engineering", label: t("profile.jobRole.engineering") },
     {
       value: "product-project",
-      label: t("profile.speakingRole.productProject"),
+      label: t("profile.jobRole.productProject"),
     },
-    { value: "sales", label: t("profile.speakingRole.sales") },
-    { value: "marketing-pr", label: t("profile.speakingRole.marketingPr") },
+    { value: "sales", label: t("profile.jobRole.sales") },
+    { value: "marketing-pr", label: t("profile.jobRole.marketingPr") },
     {
       value: "customer-success",
-      label: t("profile.speakingRole.customerSuccess"),
+      label: t("profile.jobRole.customerSuccess"),
     },
-    { value: "support", label: t("profile.speakingRole.support") },
-    { value: "operations", label: t("profile.speakingRole.operations") },
+    { value: "support", label: t("profile.jobRole.support") },
+    { value: "operations", label: t("profile.jobRole.operations") },
     {
       value: "finance-accounting",
-      label: t("profile.speakingRole.financeAccounting"),
+      label: t("profile.jobRole.financeAccounting"),
     },
-    { value: "consulting", label: t("profile.speakingRole.consulting") },
-    { value: "hr-recruiting", label: t("profile.speakingRole.hrRecruiting") },
-    { value: "healthcare", label: t("profile.speakingRole.healthcare") },
-    { value: "legal", label: t("profile.speakingRole.legal") },
+    { value: "consulting", label: t("profile.jobRole.consulting") },
+    { value: "hr-recruiting", label: t("profile.jobRole.hrRecruiting") },
+    { value: "healthcare", label: t("profile.jobRole.healthcare") },
+    { value: "legal", label: t("profile.jobRole.legal") },
     {
       value: "education-training",
-      label: t("profile.speakingRole.educationTraining"),
+      label: t("profile.jobRole.educationTraining"),
     },
     {
       value: "research-academia",
-      label: t("profile.speakingRole.researchAcademia"),
+      label: t("profile.jobRole.researchAcademia"),
     },
-    { value: "public-sector", label: t("profile.speakingRole.publicSector") },
+    { value: "public-sector", label: t("profile.jobRole.publicSector") },
     {
       value: "people-management",
-      label: t("profile.speakingRole.peopleManagement"),
+      label: t("profile.jobRole.peopleManagement"),
     },
-    { value: "leadership", label: t("profile.speakingRole.leadership") },
-    { value: "founder", label: t("profile.speakingRole.founder") },
-    { value: "creator", label: t("profile.speakingRole.creator") },
-    { value: "other", label: t("profile.speakingRole.other") },
-    { value: "prefer-not", label: t("profile.speakingRole.preferNot") },
+    { value: "leadership", label: t("profile.jobRole.leadership") },
+    { value: "founder", label: t("profile.jobRole.founder") },
+    { value: "creator", label: t("profile.jobRole.creator") },
+    { value: "other", label: t("profile.jobRole.other") },
+    { value: "prefer-not", label: t("profile.jobRole.preferNot") },
   ];
 
   const INDUSTRIES: { value: Industry; label: string }[] = [
@@ -167,18 +167,18 @@ export function AboutYouSection({
             color="$color"
             letterSpacing={0.5}
           >
-            {t("profile.speakingRole.title")}
+            {t("profile.jobRole.title")}
           </Text>
 
           <Select
-            value={speakingRole}
-            options={SPEAKING_ROLES}
-            onValueChange={onSpeakingRoleChange}
-            placeholder={t("profile.speakingRole.placeholder")}
-            open={speakingRoleSheetOpen}
-            onOpenChange={setSpeakingRoleSheetOpen}
+            value={jobRole}
+            options={JOB_ROLES}
+            onValueChange={onJobRoleChange}
+            placeholder={t("profile.jobRole.placeholder")}
+            open={jobRoleSheetOpen}
+            onOpenChange={setJobRoleSheetOpen}
             snapPoints={[75]}
-            error={errors?.speakingRole}
+            error={errors?.jobRole}
           />
         </YStack>
 

@@ -5,7 +5,7 @@ import type {
   Industry,
   Language,
   Seniority,
-  SpeakingRole,
+  jobRole,
 } from "@/components/profile/types";
 
 /**
@@ -14,7 +14,7 @@ import type {
 export interface ProfileData {
   // About You
   name: string;
-  speakingRole: SpeakingRole;
+  jobRole: jobRole;
   industry: Industry;
   seniority: Seniority;
 
@@ -45,7 +45,7 @@ interface ProfileStore {
  */
 const defaultProfile: ProfileData = {
   name: "",
-  speakingRole: "",
+  jobRole: "",
   industry: "",
   seniority: "",
   language: "en-US",

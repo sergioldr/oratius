@@ -6,6 +6,8 @@ import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert, Linking } from "react-native";
 
+import { logger } from "@/lib/logger";
+
 /**
  * Custom hook for handling audio recording permissions
  * Provides a function to request microphone access with user-friendly alerts
@@ -41,7 +43,11 @@ export function useAudioPermission() {
       );
       return false;
     } catch (error) {
-      console.error("Error requesting microphone permission:", error);
+      logger.error(
+        "useAudioPermission",
+        "Error requesting microphone permission",
+        { error }
+      );
       return false;
     }
   }, [t]);

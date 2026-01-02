@@ -5,6 +5,7 @@ import {
 } from "@supabase/supabase-js";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
+import { logger } from "./logger";
 
 /**
  * Custom storage adapter using expo-secure-store for secure session persistence.
@@ -51,7 +52,8 @@ const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_KEY;
  */
 function createSupabaseClient(): SupabaseClient {
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn(
+    logger.warn(
+      "Supabase",
       "⚠️ Supabase environment variables not set. Please create a .env file with:\n" +
         "EXPO_PUBLIC_SUPABASE_URL=your-supabase-url\n" +
         "EXPO_PUBLIC_SUPABASE_KEY=your-supabase-anon-key"

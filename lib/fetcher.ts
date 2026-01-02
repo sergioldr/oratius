@@ -1,3 +1,4 @@
+import { logger } from "./logger";
 import { supabase } from "./supabase";
 
 const API_BASE_URL = process.env.EXPO_PUBLIC_DILO_SERVER_API_URL;
@@ -42,8 +43,9 @@ export async function fetcher<TData, TBody = unknown>(
   const { method = "GET", body, headers: customHeaders = {} } = options;
 
   if (!API_BASE_URL) {
-    console.error(
-      "[fetcher] EXPO_PUBLIC_DILO_SERVER_API_URL is not configured"
+    logger.error(
+      "Fetcher",
+      "EXPO_PUBLIC_DILO_SERVER_API_URL is not configured"
     );
     return {
       data: null,
@@ -59,7 +61,9 @@ export async function fetcher<TData, TBody = unknown>(
   } = await supabase.auth.getSession();
 
   if (sessionError) {
-    console.error("[fetcher] Failed to get session:", sessionError.message);
+    logger.error("Fetcher", "Failed to get session", {
+      error: sessionError.message,
+    });
     return {
       data: null,
       error: "Failed to get authentication session",
@@ -68,7 +72,7 @@ export async function fetcher<TData, TBody = unknown>(
   }
 
   if (!session?.access_token) {
-    console.warn("[fetcher] No active session, request may be unauthorized");
+    logger.warn("Fetcher", "No active session, request may be unauthorized");
   }
 
   // Build headers with auth token
@@ -100,10 +104,13 @@ export async function fetcher<TData, TBody = unknown>(
     if (!contentType?.includes("application/json")) {
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`[fetcher] ${method} ${endpoint} failed:`, {
-          status: response.status,
-          body: errorText,
-        });
+        logger.apiResponse(
+          endpoint,
+          endpoint,
+          response.status,
+          undefined,
+          errorText
+        );
         return {
           data: null,
           error: errorText || `Request failed with status ${response.status}`,
@@ -121,10 +128,13 @@ export async function fetcher<TData, TBody = unknown>(
     const data = await response.json();
 
     if (!response.ok) {
-      console.error(`[fetcher] ${method} ${endpoint} failed:`, {
-        status: response.status,
-        body: data,
-      });
+      logger.apiResponse(
+        "Fetcher",
+        endpoint,
+        response.status,
+        data,
+        data.message || data.error
+      );
       return {
         data: null,
         error:
@@ -143,10 +153,9 @@ export async function fetcher<TData, TBody = unknown>(
   } catch (err) {
     const errorMessage =
       err instanceof Error ? err.message : "Unknown network error";
-    console.error(
-      `[fetcher] ${method} ${endpoint} network error:`,
-      errorMessage
-    );
+    logger.error("Fetcher", `${method} ${endpoint} network error`, {
+      error: errorMessage,
+    });
     return {
       data: null,
       error: errorMessage,

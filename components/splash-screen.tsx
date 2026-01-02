@@ -62,7 +62,7 @@ export function SplashScreen({ onReady }: SplashScreenProps) {
           // Update store with profile data
           setProfile({
             name: data.display_name || "",
-            speakingRole: data.speaking_role || "",
+            jobRole: data.role || "",
             industry: data.industry || "",
             seniority: data.seniority || "",
             language: data.language || getInitialLanguage(),

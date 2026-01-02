@@ -112,7 +112,7 @@ npm run deploy                                      # Deploy to production (work
 - **Network Inspection**: Monitor API calls and network requests in DevTools
 - **Element Inspector**: Debug component hierarchy and styles
 - **Performance Profiler**: Identify performance bottlenecks
-- **Logging**: Use `console.log` for debugging (remove before production), `console.warn` for deprecation notices, `console.error` for actual errors, and implement error boundaries for production error handling
+- **Logging**: Use the custom logger (`@/lib/logger`) for all logging with debug mode controlled by `EXPO_PUBLIC_DEBUG_MODE` environment variable. The logger provides `logger.debug()`, `logger.info()`, `logger.warn()`, `logger.error()`, and specialized methods like `logger.apiRequest()`, `logger.apiResponse()`, `logger.wsEvent()`, and `logger.stateTransition()`. Implement error boundaries for production error handling.
 
 ### Testing & Quality Assurance
 

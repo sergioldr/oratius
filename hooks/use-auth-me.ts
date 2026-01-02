@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { useAuth } from "@/context/auth-context";
 import { api } from "@/lib/fetcher";
+import { logger } from "@/lib/logger";
 
 interface UserMeResponse {
   id: string;
@@ -33,7 +34,7 @@ export function useAuthMe(): UseAuthMeResult {
    */
   const fetchCurrentUser = useCallback(async () => {
     if (!session?.access_token) {
-      console.log("[useAuthMe] No access token available, skipping fetch");
+      logger.debug("useAuthMe", "No access token available, skipping fetch");
       return;
     }
 
@@ -46,7 +47,7 @@ export function useAuthMe(): UseAuthMeResult {
       setError(apiError);
       setUser(null);
     } else {
-      console.log("[useAuthMe] auth/me response:", data);
+      logger.debug("useAuthMe", "auth/me response", { data });
       setUser(data);
     }
 

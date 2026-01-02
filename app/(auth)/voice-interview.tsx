@@ -1,7 +1,18 @@
 import { Ionicons } from "@expo/vector-icons";
-import { router, Stack } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
-import { Pressable, useColorScheme } from "react-native";
+import { router, Stack, useLocalSearchParams } from "expo-router";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  useColorScheme,
+} from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, XStack, YStack } from "tamagui";
@@ -9,107 +20,361 @@ import { Text, XStack, YStack } from "tamagui";
 import { InterviewTimer, SecondaryButton, Tag } from "@/components/ui";
 import { VoiceOrb } from "@/components/voice-orb";
 import { getDefaultScreenOptions } from "@/constants/navigation";
+import { useAudioStream } from "@/hooks/use-audio-stream";
+import { useWebSocketInterview } from "@/hooks/use-websocket-interview";
+import { logger } from "@/lib/logger";
+import {
+  useInterviewAgentStatus,
+  useInterviewConnection,
+  useInterviewConversation,
+  useInterviewStore,
+  type AgentStatus,
+} from "@/store/interview-store";
+import { useProfileStore } from "@/store/profile-store";
 
 /**
- * Mock interview questions
+ * Status messages for different connection states
  */
-const MOCK_QUESTIONS = [
-  "Tell me about yourself and your background in this field.",
-  "What are your greatest strengths and how do they apply to this role?",
-  "Tell me about a time you had to manage a conflict within your team.",
-  "Describe a challenging project you worked on and how you overcame obstacles.",
-  "Where do you see yourself in five years?",
-  "Why are you interested in this position and our company?",
-];
+const STATUS_MESSAGES: Record<string, string> = {
+  disconnected: "Connecting to interview...",
+  connecting: "Establishing connection...",
+  connected: "Initializing AI interviewer...",
+  ready: "Speak clearly, the AI is analyzing your response.",
+  error: "Connection error. Please try again.",
+  reconnecting: "Reconnecting...",
+};
+
+/**
+ * Get status indicator config based on agent status
+ */
+function getStatusIndicator(
+  agentStatus: AgentStatus,
+  isStreaming: boolean
+): {
+  variant: "primary" | "error";
+  label: string;
+  icon: "volume-high" | "ellipsis-horizontal" | "mic" | "mic-off";
+  color: string;
+} {
+  switch (agentStatus) {
+    case "speaking":
+      return {
+        variant: "primary",
+        label: "AI Speaking",
+        icon: "volume-high",
+        color: "#2547f4",
+      };
+    case "thinking":
+      return {
+        variant: "primary",
+        label: "Processing...",
+        icon: "ellipsis-horizontal",
+        color: "#2547f4",
+      };
+    case "listening":
+      return {
+        variant: isStreaming ? "error" : "primary",
+        label: isStreaming ? "Listening" : "Paused",
+        icon: isStreaming ? "mic" : "mic-off",
+        color: isStreaming ? "#f43f5e" : "#2547f4",
+      };
+    default:
+      return {
+        variant: "primary",
+        label: "Ready",
+        icon: "mic",
+        color: "#2547f4",
+      };
+  }
+}
 
 /**
  * Voice Interview Practice Screen
- * Mock interview session with 6 questions and voice orb visualization
+ * Real-time AI interview session with WebSocket voice connection
  */
 export default function VoiceInterviewScreen() {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const defaultScreenOptions = getDefaultScreenOptions(colorScheme);
+  const params = useLocalSearchParams<{
+    candidate_name?: string;
+    job_role?: string;
+    sector?: string;
+    seniority?: string;
+    language?: string;
+  }>();
 
-  // State management
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [isListening, setIsListening] = useState(true);
-  const [mockAudioLevel, setMockAudioLevel] = useState(0.5);
+  // Profile store state
+  const { profile } = useProfileStore();
 
-  // Mock audio level fluctuation for visual effect
+  // Interview store state
+  const { connectionStatus, lastError } = useInterviewConnection();
+  const { currentQuestion, questionCount } = useInterviewConversation();
+  const { agentStatus, audioLevel: storeAudioLevel } =
+    useInterviewAgentStatus();
+  const { incrementElapsedSeconds, reset: resetStore } = useInterviewStore();
+
+  // Local state
+  const [isInitialized, setIsInitialized] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Audio streaming hook
+  const {
+    status: audioStatus,
+    startStreaming,
+    stopStreaming,
+    audioLevel: streamAudioLevel,
+    playAudio,
+  } = useAudioStream({
+    onAudioLevel: (level) => {
+      useInterviewStore.getState().setAudioLevel(level);
+    },
+  });
+
+  // WebSocket interview hook
+  const { startInterview, endInterview, disconnect, sendAudioChunk, isReady } =
+    useWebSocketInterview({
+      onReady: useCallback(async () => {
+        logger.info(
+          "VoiceInterview",
+          "WebSocket ready - starting audio stream"
+        );
+        await startStreaming();
+        logger.debug("VoiceInterview", "Audio stream started");
+      }, [startStreaming]),
+      onAudioData: useCallback(
+        (data: ArrayBuffer) => {
+          logger.debug("VoiceInterview", "Playing received audio", {
+            sizeBytes: data.byteLength,
+            sizeKB: (data.byteLength / 1024).toFixed(2),
+          });
+          playAudio(data);
+        },
+        [playAudio]
+      ),
+      onInterviewEnd: useCallback(() => {
+        logger.info("VoiceInterview", "Interview ended - navigating to home");
+        stopStreaming();
+        router.replace("/(auth)/(tabs)/home");
+      }, [stopStreaming]),
+    });
+
+  // Derive audio level from stream or store
+  const audioLevel =
+    audioStatus === "streaming" ? streamAudioLevel : storeAudioLevel;
+
+  /**
+   * Handle connection errors - disconnect and navigate home
+   */
   useEffect(() => {
-    if (!isListening) return;
+    if (connectionStatus === "error") {
+      logger.error("VoiceInterview", "Connection error - ending session", {
+        error: lastError,
+      });
+      stopStreaming();
+      disconnect();
+      router.replace("/(auth)/(tabs)/home");
+    }
+  }, [connectionStatus, lastError, stopStreaming, disconnect]);
 
-    const interval = setInterval(() => {
-      // Random fluctuation between 0.3 and 0.9
-      setMockAudioLevel(0.3 + Math.random() * 0.6);
-    }, 100);
+  // Voice orb animation values based on audio level and agent status
+  const orbValues = useMemo(() => {
+    const level = agentStatus === "speaking" ? 0.6 : audioLevel;
+    return {
+      amplitude: 0.3 + level * 0.4,
+      speed: 0.5 + level * 0.5,
+      scale: 1 + level * 0.15,
+      glowOpacity: 0.6 + level * 0.4,
+    };
+  }, [audioLevel, agentStatus]);
 
-    return () => clearInterval(interval);
-  }, [isListening]);
-
-  // Calculate progress
-  const totalQuestions = MOCK_QUESTIONS.length;
-  const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
-  const currentQuestion = MOCK_QUESTIONS[currentQuestionIndex];
-
-  // Voice orb animation values based on mock audio level
-  const amplitude = 0.3 + mockAudioLevel * 0.4;
-  const speed = 0.5 + mockAudioLevel * 0.5;
-  const scale = 1 + mockAudioLevel * 0.15;
-  const glowOpacity = 0.6 + mockAudioLevel * 0.4;
+  // Display question (from WebSocket or placeholder)
+  const displayQuestion =
+    currentQuestion ?? "Preparing your interview question...";
 
   /**
    * Calculate adaptive font size based on question length
-   * Shorter questions: larger text (up to 32px)
-   * Longer questions: smaller text (down to 20px)
    */
-  const getAdaptiveFontSize = () => {
-    const questionLength = currentQuestion.length;
+  const adaptiveFontSize = useMemo(() => {
+    const questionLength = displayQuestion.length;
     if (questionLength < 80) return 28;
     if (questionLength < 100) return 24;
     return 20;
-  };
+  }, [displayQuestion]);
 
-  const adaptiveFontSize = getAdaptiveFontSize();
   const adaptiveLineHeight = adaptiveFontSize * 1.3;
 
   /**
-   * Handle skip to next question
+   * Initialize interview session on mount
    */
-  const handleSkip = () => {
-    if (currentQuestionIndex < totalQuestions - 1) {
-      setCurrentQuestionIndex((prev) => prev + 1);
-      setIsListening(true);
-    } else {
-      // Last question - complete interview
-      handleComplete();
+  useEffect(() => {
+    const initializeInterview = async () => {
+      if (isInitialized) return;
+
+      logger.info("VoiceInterview", "Initializing interview session");
+      logger.debug("VoiceInterview", "URL params", { params });
+      logger.debug("VoiceInterview", "Profile data", {
+        name: profile.name,
+        role: profile.jobRole,
+        industry: profile.industry,
+        seniority: profile.seniority,
+        language: profile.language,
+      });
+
+      setIsInitialized(true);
+
+      // Map language locale to language name (e.g., "en-US" -> "English")
+      const languageMap: Record<string, string> = {
+        "en-US": "English",
+        "es-ES": "Spanish",
+        // Add more mappings as needed
+      };
+
+      const interviewParams = {
+        candidate_name: params.candidate_name ?? (profile.name || "Candidate"),
+        job_role: params.job_role ?? (profile.jobRole || "Professional"),
+        sector: params.sector ?? (profile.industry || "Technology"),
+        seniority: params.seniority ?? (profile.seniority || "Mid-Level"),
+        language: params.language ?? languageMap[profile.language] ?? "English",
+      };
+
+      logger.info(
+        "VoiceInterview",
+        "Starting interview with params",
+        interviewParams
+      );
+      const success = await startInterview(interviewParams);
+
+      if (!success) {
+        logger.error("VoiceInterview", "Failed to start interview session");
+        Alert.alert(
+          "Connection Error",
+          "Failed to start the interview session. Please try again.",
+          [
+            {
+              text: "Go Back",
+              onPress: () => {
+                logger.info(
+                  "VoiceInterview",
+                  "User cancelled after connection error"
+                );
+                router.back();
+              },
+            },
+          ]
+        );
+      } else {
+        logger.info("VoiceInterview", "Interview session started successfully");
+      }
+    };
+
+    initializeInterview();
+  }, [isInitialized, params, profile, startInterview]);
+
+  /**
+   * Start elapsed time timer when ready
+   */
+  useEffect(() => {
+    if (isReady && !timerRef.current) {
+      logger.info("VoiceInterview", "Starting interview timer");
+      timerRef.current = setInterval(() => {
+        incrementElapsedSeconds();
+      }, 1000);
     }
-  };
+
+    return () => {
+      if (timerRef.current) {
+        logger.debug("VoiceInterview", "Stopping interview timer");
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [isReady, incrementElapsedSeconds]);
+
+  /**
+   * Send audio chunks to WebSocket when streaming
+   */
+  useEffect(() => {
+    // Audio chunks are sent via the onAudioChunk callback in useAudioStream
+    // which is connected to sendAudioChunk via the WebSocket hook
+  }, [sendAudioChunk]);
+
+  /**
+   * Cleanup on unmount
+   */
+  useEffect(() => {
+    return () => {
+      logger.info("VoiceInterview", "Component unmounting - cleaning up");
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+      resetStore();
+    };
+  }, [resetStore]);
 
   /**
    * Handle end interview with confirmation
    */
-  const handleEnd = () => {
-    // In a real implementation, show a confirmation dialog
-    router.back();
-  };
+  const handleEnd = useCallback(() => {
+    logger.info("VoiceInterview", "User requested to end interview");
+    Alert.alert(
+      "End Interview",
+      "Are you sure you want to end this interview session?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+          onPress: () =>
+            logger.debug("VoiceInterview", "User cancelled end interview"),
+        },
+        {
+          text: "End",
+          style: "destructive",
+          onPress: async () => {
+            logger.info("VoiceInterview", "User confirmed end interview");
+            await stopStreaming();
+            logger.debug("VoiceInterview", "Audio streaming stopped");
+            await endInterview();
+            logger.info("VoiceInterview", "Interview ended");
+          },
+        },
+      ]
+    );
+  }, [stopStreaming, endInterview]);
 
   /**
-   * Handle interview completion
+   * Handle close button (same as end)
    */
-  const handleComplete = () => {
-    // Navigate to home after completing all questions
-    router.replace("/(auth)/(tabs)/home");
-  };
+  const handleClose = useCallback(() => {
+    handleEnd();
+  }, [handleEnd]);
 
   /**
-   * Handle close button
+   * Toggle audio streaming (pause/resume)
    */
-  const handleClose = () => {
-    router.back();
-  };
+  const handleToggleStreaming = useCallback(async () => {
+    logger.info("VoiceInterview", "User toggled audio streaming", {
+      currentStatus: audioStatus,
+    });
 
+    if (audioStatus === "streaming") {
+      logger.debug("VoiceInterview", "Stopping audio stream");
+      await stopStreaming();
+      logger.info("VoiceInterview", "Audio stream paused");
+    } else if (audioStatus === "idle" || audioStatus === "paused") {
+      logger.debug("VoiceInterview", "Starting audio stream");
+      await startStreaming();
+      logger.info("VoiceInterview", "Audio stream resumed");
+    }
+  }, [audioStatus, startStreaming, stopStreaming]);
+
+  // Status indicator configuration
+  const statusIndicator = getStatusIndicator(
+    agentStatus,
+    audioStatus === "streaming"
+  );
+
+  // Screen options
   const screenOptions = useMemo(
     () => ({
       headerTitle: "Practice Session",
@@ -131,8 +396,14 @@ export default function VoiceInterviewScreen() {
       ),
       headerRight: () => <InterviewTimer />,
     }),
-    [defaultScreenOptions.headerTintColor, colorScheme]
+    [defaultScreenOptions.headerTintColor, colorScheme, handleClose]
   );
+
+  // Loading state while connecting
+  const isLoading =
+    connectionStatus === "disconnected" ||
+    connectionStatus === "connecting" ||
+    connectionStatus === "connected";
 
   return (
     <YStack
@@ -153,11 +424,11 @@ export default function VoiceInterviewScreen() {
             textTransform="uppercase"
             color="$gray10"
           >
-            Question {currentQuestionIndex + 1} of {totalQuestions}
+            {questionCount > 0 ? `Question ${questionCount}` : "Starting..."}
           </Text>
         </XStack>
 
-        {/* Progress Bar */}
+        {/* Progress Bar - shows connection status or question progress */}
         <YStack
           height={6}
           width="100%"
@@ -167,30 +438,50 @@ export default function VoiceInterviewScreen() {
         >
           <YStack
             height="100%"
-            width={`${progress}%`}
-            backgroundColor="$primary6"
+            width={isReady ? "100%" : "30%"}
+            backgroundColor={isReady ? "$primary6" : "$gray8"}
+            opacity={isLoading ? 0.5 : 1}
           />
         </YStack>
       </YStack>
 
       {/* Main Content */}
       <YStack flex={1} paddingHorizontal="$6">
-        {/* Question Text */}
+        {/* Question Text or Loading State */}
         <Animated.View
-          key={currentQuestionIndex}
+          key={currentQuestion ?? "loading"}
           entering={FadeIn.duration(400)}
           exiting={FadeOut.duration(200)}
         >
-          <Text
-            fontSize={adaptiveFontSize}
-            fontWeight="700"
-            lineHeight={adaptiveLineHeight}
-            textAlign="center"
-            color="$color"
-            marginTop="$6"
-          >
-            {currentQuestion}
-          </Text>
+          {isLoading ? (
+            <YStack alignItems="center" marginTop="$6" gap="$4">
+              <ActivityIndicator size="large" color="#2547f4" />
+              <Text
+                fontSize={20}
+                fontWeight="500"
+                textAlign="center"
+                color="$gray11"
+              >
+                {STATUS_MESSAGES[connectionStatus]}
+              </Text>
+              {lastError && (
+                <Text fontSize={14} textAlign="center" color="$red10">
+                  {lastError}
+                </Text>
+              )}
+            </YStack>
+          ) : (
+            <Text
+              fontSize={adaptiveFontSize}
+              fontWeight="700"
+              lineHeight={adaptiveLineHeight}
+              textAlign="center"
+              color="$color"
+              marginTop="$6"
+            >
+              {displayQuestion}
+            </Text>
+          )}
         </Animated.View>
 
         {/* Voice Orb Container */}
@@ -200,14 +491,13 @@ export default function VoiceInterviewScreen() {
           justifyContent="center"
           marginVertical="$8"
         >
-          {/* Voice Orb */}
           <VoiceOrb
-            isRecording={isListening}
-            glowOpacity={glowOpacity}
-            scale={scale}
-            amplitude={amplitude}
-            speed={speed}
-            onPress={() => setIsListening(!isListening)}
+            isRecording={isReady && audioStatus === "streaming"}
+            glowOpacity={orbValues.glowOpacity}
+            scale={orbValues.scale}
+            amplitude={orbValues.amplitude}
+            speed={orbValues.speed}
+            onPress={isReady ? handleToggleStreaming : undefined}
           />
         </YStack>
 
@@ -216,28 +506,31 @@ export default function VoiceInterviewScreen() {
           {/* Status Indicator */}
           <YStack gap="$2" alignItems="center">
             <Tag
-              variant={isListening ? "error" : "primary"}
+              variant={statusIndicator.variant}
               size="lg"
-              label={isListening ? "Listening" : "Paused"}
+              label={statusIndicator.label}
               icon={
                 <Ionicons
-                  name={isListening ? "mic" : "mic-off"}
+                  name={statusIndicator.icon}
                   size={20}
-                  color={isListening ? "#f43f5e" : "#2547f4"}
+                  color={statusIndicator.color}
                 />
               }
             />
 
             <Text fontSize="$1" color="$gray10">
-              Speak clearly, the AI is analyzing your tone.
+              {STATUS_MESSAGES[connectionStatus] ?? STATUS_MESSAGES.ready}
             </Text>
           </YStack>
 
           {/* Action Buttons */}
           <XStack gap="$4" width="100%">
             <YStack flex={1}>
-              <SecondaryButton onPress={handleSkip}>
-                {currentQuestionIndex < totalQuestions - 1 ? "Skip" : "Finish"}
+              <SecondaryButton
+                onPress={handleToggleStreaming}
+                disabled={!isReady}
+              >
+                {audioStatus === "streaming" ? "Pause" : "Resume"}
               </SecondaryButton>
             </YStack>
 

@@ -171,7 +171,7 @@
     "speaking": {
       "title": "Speaking"
     },
-    "speakingRole": {
+    "jobRole": {
       "title": "Role you're interviewing for",
       "placeholder": "Select a role",
       "engineering": "Engineering",

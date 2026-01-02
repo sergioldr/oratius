@@ -175,13 +175,11 @@ export default function ProfileScreen() {
           <View ref={aboutYouRef}>
             <AboutYouSection
               name={formData.name}
-              speakingRole={formData.speakingRole}
+              jobRole={formData.jobRole}
               industry={formData.industry}
               seniority={formData.seniority}
               onNameChange={(value) => updateField("name", value)}
-              onSpeakingRoleChange={(value) =>
-                updateField("speakingRole", value)
-              }
+              onJobRoleChange={(value) => updateField("jobRole", value)}
               onIndustryChange={(value) => updateField("industry", value)}
               onSeniorityChange={(value) => updateField("seniority", value)}
               errors={fieldErrors}

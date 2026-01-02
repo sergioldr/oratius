@@ -167,7 +167,7 @@
     "speaking": {
       "title": "Comunicación"
     },
-    "speakingRole": {
+    "jobRole": {
       "title": "Rol al hablar",
       "placeholder": "Seleccionar rol",
       "leadership": "Liderazgo",
