@@ -11,7 +11,11 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.freelanthird.oratious",
-      "usesAppleSignIn": true
+      "usesAppleSignIn": true,
+      "infoPlist": {
+        "UIBackgroundModes": ["audio"],
+        "NSMicrophoneUsageDescription": "Oratious needs access to your microphone to conduct voice interviews and analyze your speaking patterns."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -51,7 +55,12 @@
           "iosUrlScheme": "com.googleusercontent.apps.YOUR_IOS_CLIENT_ID"
         }
       ],
-      "expo-audio"
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Oratious needs access to your microphone to conduct voice interviews and analyze your speaking patterns."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
