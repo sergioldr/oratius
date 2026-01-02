@@ -4,6 +4,7 @@ export { FeatureCard } from "./feature-card";
 export { GhostButton } from "./ghost-button";
 export { HeroStreakCard } from "./hero-streak-card";
 export { Icon } from "./icon";
+export { InterviewTimer } from "./interview-timer";
 export { ModeButton } from "./mode-button";
 export { PrimaryButton } from "./primary-button";
 export { RadioGroup, RadioItem } from "./radio-group";

@@ -6,6 +6,8 @@ const BACKGROUND_DARK = "#101322";
 const CARD_DARK = "rgba(31, 41, 55, 0.5)"; // gray-800 at 50% opacity
 const BORDER_DARK = "rgba(55, 65, 81, 0.5)"; // gray-700 at 50% opacity
 const BUTTON_BACKGROUND_DARK = "rgba(31, 41, 55, 0.5)"; // gray-800 at 50% opacity
+const BUTTON_SELECTED_BACKGROUND_DARK = "rgba(37, 71, 244, 0.15)";
+const BUTTON_SELECTED_BORDER_DARK = "rgba(37, 71, 244, 0.3)";
 const COLOR_DARK = "#ffffff";
 
 // Light theme colors
@@ -16,6 +18,8 @@ const BORDER_LIGHT_HOVER = "#d1d5db";
 const COLOR_LIGHT = "#111218";
 const BUTTON_BACKGROUND_LIGHT = "#ffffff";
 const BUTTON_BACKGROUND_LIGHT_HOVER = "#f9fafb";
+const BUTTON_SELECTED_BACKGROUND_LIGHT = "rgba(37, 71, 244, 0.1)";
+const BUTTON_SELECTED_BORDER_LIGHT = "rgba(37, 71, 244, 0.2)";
 
 const montserratFont = createFont({
   family: "Montserrat",
@@ -147,10 +151,12 @@ const tamaguiConfig = createTamagui({
       switchBackground: BORDER_DARK,
       switchBorderColor: BORDER_DARK,
       // Selected button colors
-      buttonSelectedBackground: "rgba(37, 71, 244, 0.15)",
-      buttonSelectedBorderColor: "rgba(37, 71, 244, 0.3)",
+      buttonSelectedBackground: BUTTON_SELECTED_BACKGROUND_DARK,
+      buttonSelectedBorderColor: BUTTON_SELECTED_BORDER_DARK,
       // sheet
       sheetBackground: BACKGROUND_DARK,
+      // slider
+      sliderTrackBackground: BORDER_DARK,
     },
     light: {
       ...config.themes.light,
@@ -178,10 +184,12 @@ const tamaguiConfig = createTamagui({
       switchBackground: BORDER_LIGHT,
       switchBorderColor: BORDER_LIGHT,
       // Selected button colors
-      buttonSelectedBackground: "rgba(37, 71, 244, 0.1)",
-      buttonSelectedBorderColor: "rgba(37, 71, 244, 0.2)",
+      buttonSelectedBackground: BUTTON_SELECTED_BACKGROUND_LIGHT,
+      buttonSelectedBorderColor: BUTTON_SELECTED_BORDER_LIGHT,
       // sheet
       sheetBackground: BACKGROUND_LIGHT,
+      // slider
+      sliderTrackBackground: BORDER_DARK,
     },
   },
 });

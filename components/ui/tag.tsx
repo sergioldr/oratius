@@ -1,9 +1,11 @@
+import React from "react";
 import { styled, Text, XStack, type GetProps } from "tamagui";
 
 const StyledTag = styled(XStack, {
   name: "Tag",
   alignItems: "center",
   justifyContent: "center",
+  gap: "$2",
   paddingHorizontal: "$2",
   paddingVertical: "$1",
   borderRadius: "$10",
@@ -116,6 +118,10 @@ export interface TagProps extends Omit<StyledTagProps, "children"> {
    */
   label: string;
   /**
+   * Optional icon element to display before the label
+   */
+  icon?: React.ReactNode;
+  /**
    * Visual style variant of the tag
    * @default "default"
    */
@@ -132,12 +138,14 @@ export interface TagProps extends Omit<StyledTagProps, "children"> {
  */
 export function Tag({
   label,
+  icon,
   variant = "default",
   size = "md",
   ...props
 }: TagProps) {
   return (
     <StyledTag variant={variant} size={size} {...props}>
+      {icon}
       <StyledTagText variant={variant} size={size}>
         {label}
       </StyledTagText>

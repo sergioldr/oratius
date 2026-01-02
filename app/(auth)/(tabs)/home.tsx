@@ -1,4 +1,4 @@
-import { Href, router } from "expo-router";
+import { router } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from "react-native";
@@ -8,7 +8,6 @@ import { Text, XStack, YStack } from "tamagui";
 import { Iridescence } from "@/components/iridescence";
 import { PulsingMicButton } from "@/components/pulsing-mic-button";
 import { HeroStreakCard, Select, StatCard } from "@/components/ui";
-import { useUser } from "@/context/user-context";
 import { useAudioPermission } from "@/hooks/use-audio-permission";
 import { useAuthMe } from "@/hooks/use-auth-me";
 import { useProfileStore } from "@/store/profile-store";
@@ -30,7 +29,6 @@ function getGreeting(t: (key: string) => string): string {
 
 export default function HomeScreen() {
   const { t } = useTranslation();
-  const { userData } = useUser();
   const { profile } = useProfileStore();
   const insets = useSafeAreaInsets();
 
@@ -53,7 +51,9 @@ export default function HomeScreen() {
     const hasPermission = await requestPermission();
 
     if (hasPermission) {
-      router.push(`/record-voice?mode=interview&type=${interviewType}` as Href);
+      router.push({
+        pathname: "/(auth)/voice-interview",
+      });
     }
   };
 

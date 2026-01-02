@@ -49,12 +49,40 @@ export function VoiceOrb({
     transform: [{ scale: withTiming(scale, { duration: 50 }) }],
   }));
 
+  const outerRingStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: withTiming(scale, { duration: 50 }) }],
+    borderColor: withTiming(
+      isRecording ? "rgba(244, 63, 94, 0.15)" : "rgba(37, 71, 244, 0.15)",
+      { duration: 700 }
+    ),
+  }));
+
+  const middleRingStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: withTiming(scale, { duration: 50 }) }],
+    borderColor: withTiming(
+      isRecording ? "rgba(244, 63, 94, 0.25)" : "rgba(37, 71, 244, 0.25)",
+      { duration: 700 }
+    ),
+  }));
+
   return (
     <TouchableOpacity
       activeOpacity={0.9}
       onPress={onPress}
       style={[styles.button, style]}
     >
+      {/* Outer Ring */}
+      <Animated.View
+        style={[styles.outerRing, outerRingStyle]}
+        pointerEvents="none"
+      />
+
+      {/* Middle Ring */}
+      <Animated.View
+        style={[styles.middleRing, middleRingStyle]}
+        pointerEvents="none"
+      />
+
       {/* Glow effect using shadow - creates diffused light behind orb */}
       <Animated.View
         pointerEvents="none"
@@ -93,6 +121,22 @@ const styles = StyleSheet.create({
     padding: 0,
     justifyContent: "center",
     alignItems: "center",
+  },
+  outerRing: {
+    position: "absolute",
+    width: 300,
+    height: 300,
+    borderRadius: 160,
+    borderWidth: 1,
+    borderColor: "rgba(37, 71, 244, 0.15)",
+  },
+  middleRing: {
+    position: "absolute",
+    width: 280,
+    height: 280,
+    borderRadius: 160,
+    borderWidth: 1,
+    borderColor: "rgba(37, 71, 244, 0.25)",
   },
   // Single glow element with background color and large shadow
   glowShadow: {

@@ -112,7 +112,7 @@ function AppContent({ colorScheme }: AppContentProps) {
     if (isAppReady) {
       if (session) {
         // User is authenticated, go to home
-        router.replace("/(auth)/home");
+        router.replace("/(auth)/(tabs)/home");
       }
       // If no session, stay on index (welcome screen)
     }
@@ -152,7 +152,7 @@ function AppContent({ colorScheme }: AppContentProps) {
                   name="close"
                   size={28}
                   color={screenOptions.headerTintColor}
-                  style={{ opacity: 0.8, paddingLeft: 4.5 }}
+                  style={{ opacity: 0.8, paddingLeft: 4 }}
                 />
               </Pressable>
             ),

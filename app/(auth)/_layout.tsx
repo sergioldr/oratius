@@ -58,6 +58,16 @@ export default function AuthLayout() {
           animation: "fade",
         }}
       />
+      <Stack.Screen
+        name="voice-interview"
+        options={{
+          presentation: "fullScreenModal",
+          animation: "fade",
+          headerShown: true,
+          headerTransparent: true,
+          headerTitle: "",
+        }}
+      />
     </Stack>
   );
 }

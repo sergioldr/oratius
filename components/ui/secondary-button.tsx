@@ -8,6 +8,7 @@ interface SecondaryButtonProps extends Omit<ButtonProps, "icon" | "children"> {
   icon?: IoniconsName;
   iconPosition?: "left" | "right";
   iconSize?: number;
+  textColor?: string;
 }
 
 export function SecondaryButton({
@@ -15,6 +16,7 @@ export function SecondaryButton({
   icon,
   iconPosition = "right",
   iconSize = 20,
+  textColor = "$color",
   ...props
 }: SecondaryButtonProps) {
   const theme = useTheme();
@@ -22,24 +24,23 @@ export function SecondaryButton({
 
   return (
     <Button
+      size="$6"
       backgroundColor="$buttonBackground"
       borderWidth={1}
-      borderColor="$buttonBorderColor"
+      borderColor="transparent"
       pressStyle={{
         backgroundColor: "$buttonBackgroundPress",
-        borderColor: "$buttonBorderColor",
+        borderColor: "transparent",
       }}
       hoverStyle={{
         backgroundColor: "$buttonBackgroundHover",
-        borderColor: "$borderColorHover",
+        borderColor: "transparent",
       }}
       focusStyle={{
         backgroundColor: "$buttonBackground",
-        borderColor: "$buttonBorderColor",
+        borderColor: "transparent",
       }}
-      color="$color"
-      borderRadius="$4"
-      paddingHorizontal="$5"
+      borderRadius="$6"
       flexDirection={iconPosition === "left" ? "row" : "row"}
       justifyContent={icon ? "space-between" : "center"}
       {...props}
@@ -48,9 +49,9 @@ export function SecondaryButton({
         <Ionicons name={icon} size={iconSize} color={iconColor} />
       )}
       <Text
-        fontSize="$2"
+        fontSize="$4"
         fontWeight="500"
-        color="$color"
+        color={textColor}
         numberOfLines={1}
         flex={icon ? 1 : undefined}
         textAlign={icon ? "left" : "center"}
