@@ -118,7 +118,10 @@ export default function VoiceInterviewScreen() {
   const [isInitialized, setIsInitialized] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Audio streaming hook
+  // Ref to hold sendAudioChunk to avoid circular dependency
+  const sendAudioChunkRef = useRef<((data: ArrayBuffer) => void) | null>(null);
+
+  // Audio streaming hook - connects to WebSocket via onAudioChunk callback
   const {
     status: audioStatus,
     startStreaming,
@@ -126,6 +129,10 @@ export default function VoiceInterviewScreen() {
     audioLevel: streamAudioLevel,
     playAudio,
   } = useAudioStream({
+    onAudioChunk: useCallback((chunk: ArrayBuffer) => {
+      // Send audio chunk to WebSocket for real-time streaming
+      sendAudioChunkRef.current?.(chunk);
+    }, []),
     onAudioLevel: (level) => {
       useInterviewStore.getState().setAudioLevel(level);
     },
@@ -295,8 +302,9 @@ export default function VoiceInterviewScreen() {
    * Send audio chunks to WebSocket when streaming
    */
   useEffect(() => {
-    // Audio chunks are sent via the onAudioChunk callback in useAudioStream
-    // which is connected to sendAudioChunk via the WebSocket hook
+    // Connect sendAudioChunk from WebSocket hook to the ref
+    // This allows useAudioStream to send chunks without circular dependency
+    sendAudioChunkRef.current = sendAudioChunk;
   }, [sendAudioChunk]);
 
   /**

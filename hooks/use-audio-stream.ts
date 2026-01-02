@@ -1,22 +1,13 @@
 import {
-  AudioModule,
-  AudioQuality,
-  IOSOutputFormat,
-  RecordingOptions,
-  setAudioModeAsync,
-  setIsAudioActiveAsync,
+  AudioDataEvent,
+  ExpoAudioStreamModule,
+  RecordingConfig,
   useAudioRecorder,
-  useAudioRecorderState,
-} from "expo-audio";
+} from "@siteed/expo-audio-studio";
+import { createAudioPlayer, setAudioModeAsync } from "expo-audio";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
 
-import {
-  AUDIO_STREAM_CONFIG,
-  calculateRmsLevel,
-  float32ToInt16,
-  normalizeMeteringDb,
-} from "@/lib/audio-utils";
 import { logger } from "@/lib/logger";
 
 /**
@@ -35,8 +26,8 @@ export type AudioStreamStatus =
 interface UseAudioStreamConfig {
   /** Sample rate for audio capture (default: 16000 for voice) */
   sampleRate?: number;
-  /** Enable metering for visualization (default: true) */
-  enableMetering?: boolean;
+  /** Interval in ms for audio buffer emission (default: 100) */
+  interval?: number;
   /** Callback when audio chunk is ready to send */
   onAudioChunk?: (chunk: ArrayBuffer) => void;
   /** Callback for audio level updates (0-1) */
@@ -56,12 +47,12 @@ interface UseAudioStreamResult {
   /** Stop audio streaming */
   stopStreaming: () => Promise<void>;
   /** Pause audio streaming */
-  pauseStreaming: () => void;
+  pauseStreaming: () => Promise<void>;
   /** Resume audio streaming */
-  resumeStreaming: () => void;
+  resumeStreaming: () => Promise<void>;
   /** Current audio level (0-1) for visualization */
   audioLevel: number;
-  /** Play received audio data (web only) */
+  /** Play received audio data */
   playAudio: (audioData: ArrayBuffer) => Promise<void>;
   /** Stop audio playback */
   stopPlayback: () => void;
@@ -69,47 +60,29 @@ interface UseAudioStreamResult {
   isPlaying: boolean;
 }
 
-/**
- * Recording options optimized for voice streaming at 16kHz
- */
-const STREAMING_RECORDING_OPTIONS: RecordingOptions = {
-  extension: ".m4a",
-  sampleRate: AUDIO_STREAM_CONFIG.SAMPLE_RATE,
-  numberOfChannels: 1,
-  bitRate: AUDIO_STREAM_CONFIG.BIT_RATE,
-  isMeteringEnabled: true,
-  android: {
-    outputFormat: "mpeg4",
-    audioEncoder: "aac",
-    sampleRate: AUDIO_STREAM_CONFIG.SAMPLE_RATE,
-  },
-  ios: {
-    outputFormat: IOSOutputFormat.MPEG4AAC,
-    audioQuality: AudioQuality.HIGH,
-    sampleRate: AUDIO_STREAM_CONFIG.SAMPLE_RATE,
-    linearPCMBitDepth: 16,
-    linearPCMIsBigEndian: false,
-    linearPCMIsFloat: false,
-  },
-  web: {
-    mimeType: "audio/webm",
-    bitsPerSecond: AUDIO_STREAM_CONFIG.BIT_RATE,
-  },
+/** Audio stream configuration optimized for voice WebSocket streaming */
+const STREAM_CONFIG = {
+  SAMPLE_RATE: 16000 as const,
+  CHANNELS: 1 as const,
+  ENCODING: "pcm_16bit" as const,
+  INTERVAL: 100, // ms between audio buffer emissions
 };
 
 /**
- * Custom hook for streaming audio to WebSocket.
+ * Custom hook for streaming audio to WebSocket using @siteed/expo-audio-studio.
  *
- * Platform behavior:
- * - Web: Uses Web Audio API for real-time audio chunk streaming
- * - Native: Uses expo-audio for metering; actual audio streaming handled separately
+ * This hook provides cross-platform real-time audio streaming with:
+ * - PCM audio chunks via onAudioStream callback
+ * - Built-in RMS/energy analysis for visualization
+ * - Zero-latency recording start via prepareRecording API
+ * - Consistent behavior across iOS, Android, and Web
  */
 export function useAudioStream(
   config?: UseAudioStreamConfig
 ): UseAudioStreamResult {
   const {
-    sampleRate = AUDIO_STREAM_CONFIG.SAMPLE_RATE,
-    enableMetering = true,
+    sampleRate = STREAM_CONFIG.SAMPLE_RATE,
+    interval = STREAM_CONFIG.INTERVAL,
     onAudioChunk,
     onAudioLevel,
     onError,
@@ -120,28 +93,46 @@ export function useAudioStream(
   const [audioLevel, setAudioLevel] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // Ref to track audio mode readiness (avoids stale closure issues)
-  const isAudioModeReadyRef = useRef(false);
-
-  // Native audio recorder with built-in state polling
-  const audioRecorder = useAudioRecorder(STREAMING_RECORDING_OPTIONS);
-  const recorderState = useAudioRecorderState(
-    audioRecorder,
-    AUDIO_STREAM_CONFIG.METERING_INTERVAL
-  );
-
-  // Web audio refs
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const mediaStreamRef = useRef<MediaStream | null>(null);
-  const workletNodeRef = useRef<AudioWorkletNode | null>(null);
-  const playbackSourceRef = useRef<AudioBufferSourceNode | null>(null);
+  // Refs
   const isMountedRef = useRef(true);
   const statusRef = useRef(status);
+  const onAudioChunkRef = useRef(onAudioChunk);
+  const onAudioLevelRef = useRef(onAudioLevel);
+  const onErrorRef = useRef(onError);
 
-  // Keep statusRef in sync
+  // Web audio playback refs
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const playbackSourceRef = useRef<AudioBufferSourceNode | null>(null);
+
+  // Audio recorder from expo-audio-studio
+  const {
+    startRecording,
+    stopRecording,
+    pauseRecording,
+    resumeRecording,
+    isRecording,
+    isPaused,
+    analysisData,
+  } = useAudioRecorder({
+    logger: __DEV__ ? console : undefined,
+  });
+
+  // Keep refs in sync
   useEffect(() => {
     statusRef.current = status;
   }, [status]);
+
+  useEffect(() => {
+    onAudioChunkRef.current = onAudioChunk;
+  }, [onAudioChunk]);
+
+  useEffect(() => {
+    onAudioLevelRef.current = onAudioLevel;
+  }, [onAudioLevel]);
+
+  useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
 
   // Track mounted state
   useEffect(() => {
@@ -151,366 +142,82 @@ export function useAudioStream(
     };
   }, []);
 
-  // Set up audio mode on mount for native platforms
-  // This ensures the audio session is configured before any recording attempts
+  // Update audio level from analysis data (RMS)
   useEffect(() => {
-    if (Platform.OS === "web") {
-      isAudioModeReadyRef.current = true;
+    if (analysisData && status === "streaming") {
+      // Use energy or calculate from analysis data
+      const energy = (analysisData as { energy?: number }).energy;
+      if (energy !== undefined) {
+        // Energy is typically 0-1, amplify for better visualization
+        const normalizedLevel = Math.min(1, energy * 3);
+        setAudioLevel(normalizedLevel);
+        onAudioLevelRef.current?.(normalizedLevel);
+      }
+    }
+  }, [analysisData, status]);
+
+  // Sync status with recorder state
+  useEffect(() => {
+    if (!isMountedRef.current) return;
+
+    if (isRecording && !isPaused && status !== "streaming") {
+      setStatus("streaming");
+    } else if (isPaused && status !== "paused") {
+      setStatus("paused");
+    }
+  }, [isRecording, isPaused, status]);
+
+  /**
+   * Handle incoming audio stream data from the recorder.
+   * Converts to ArrayBuffer and sends via callback.
+   */
+  const handleAudioStream = useCallback(async (event: AudioDataEvent) => {
+    if (!isMountedRef.current || statusRef.current !== "streaming") {
       return;
     }
 
-    let mounted = true;
-
-    const setupAudioMode = async () => {
-      try {
-        logger.debug("AudioStream", "Setting up audio mode on mount");
-
-        // Request permission using AudioModule directly
-        const permissionStatus =
-          await AudioModule.requestRecordingPermissionsAsync();
-        if (!permissionStatus.granted) {
-          logger.warn("AudioStream", "Permission not granted during setup");
-          return;
-        }
-
-        if (!mounted) return;
-
-        // Activate the audio subsystem
-        logger.debug("AudioStream", "Activating audio subsystem");
-        await setIsAudioActiveAsync(true);
-
-        // Wait a bit after activation
-        await new Promise((resolve) => setTimeout(resolve, 100));
-
-        if (!mounted) return;
-
-        // Configure audio mode for recording with explicit settings:
-        // - allowsRecording: true - Enable microphone recording
-        // - playsInSilentMode: true - Allow audio playback when iOS silent switch is on
-        // - interruptionMode: "doNotMix" - Request exclusive audio focus for clear recording
-        logger.debug("AudioStream", "Configuring audio mode");
-        await setAudioModeAsync({
-          allowsRecording: true,
-          playsInSilentMode: true,
-          interruptionMode: "doNotMix",
-        });
-
-        // Give iOS more time to configure the audio session
-        await new Promise((resolve) => setTimeout(resolve, 300));
-
-        if (mounted) {
-          logger.info("AudioStream", "Audio mode ready");
-          isAudioModeReadyRef.current = true;
-        }
-      } catch (error) {
-        logger.error("AudioStream", "Failed to set up audio mode", {
-          error: error instanceof Error ? error.message : String(error),
-        });
-      }
-    };
-
-    setupAudioMode();
-
-    return () => {
-      mounted = false;
-      isAudioModeReadyRef.current = false;
-      // Reset audio mode on unmount
-      setAudioModeAsync({ allowsRecording: false }).catch(() => {
-        // Ignore cleanup errors
-      });
-    };
-  }, []);
-
-  // Native metering via useAudioRecorderState (replaces manual polling)
-  useEffect(() => {
-    if (Platform.OS === "web" || !enableMetering) return;
-    if (status !== "streaming") return;
-
-    if (recorderState?.metering != null) {
-      const level = normalizeMeteringDb(recorderState.metering);
-      setAudioLevel(level);
-      onAudioLevel?.(level);
-    }
-  }, [recorderState?.metering, status, enableMetering, onAudioLevel]);
-
-  /**
-   * Create AudioWorklet processor code as a blob URL.
-   * This allows us to use AudioWorklet without external files.
-   */
-  const createWorkletProcessor = useCallback(() => {
-    const processorCode = `
-      class AudioStreamProcessor extends AudioWorkletProcessor {
-        constructor() {
-          super();
-          this.chunkCount = 0;
-        }
-
-        process(inputs, outputs, parameters) {
-          const input = inputs[0];
-          if (input && input[0] && input[0].length > 0) {
-            const channelData = input[0];
-            
-            // Send audio data to main thread
-            this.port.postMessage({
-              type: 'audio',
-              samples: channelData,
-              chunkCount: this.chunkCount++
-            });
-          }
-          return true;
-        }
-      }
-
-      registerProcessor('audio-stream-processor', AudioStreamProcessor);
-    `;
-
-    const blob = new Blob([processorCode], { type: "application/javascript" });
-    return URL.createObjectURL(blob);
-  }, []);
-
-  /**
-   * Start audio streaming for Web platform using AudioWorklet API
-   */
-  const startWebStreaming = useCallback(async (): Promise<boolean> => {
     try {
-      logger.info("AudioStream", "Starting web audio streaming", {
-        sampleRate,
-      });
+      // event.data contains the PCM audio data
+      // On native: base64 encoded string
+      // On web: Uint8Array buffer
+      let audioBuffer: ArrayBuffer;
 
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          sampleRate,
-          channelCount: 1,
-          echoCancellation: true,
-          noiseSuppression: true,
-        },
-      });
-
-      mediaStreamRef.current = stream;
-
-      const audioContext = new AudioContext({ sampleRate });
-      audioContextRef.current = audioContext;
-
-      // Create and load the AudioWorklet processor
-      const workletUrl = createWorkletProcessor();
-      try {
-        await audioContext.audioWorklet.addModule(workletUrl);
-      } finally {
-        URL.revokeObjectURL(workletUrl);
-      }
-
-      const source = audioContext.createMediaStreamSource(stream);
-      const workletNode = new AudioWorkletNode(
-        audioContext,
-        "audio-stream-processor"
-      );
-      workletNodeRef.current = workletNode;
-
-      // Handle audio data from worklet
-      workletNode.port.onmessage = (event) => {
-        if (!isMountedRef.current || statusRef.current !== "streaming") return;
-
-        const { samples, chunkCount } = event.data;
-        const inputData = new Float32Array(samples);
-
-        // Calculate and emit audio level
-        const level = calculateRmsLevel(inputData);
-        setAudioLevel(level);
-        onAudioLevel?.(level);
-
-        // Convert and send audio chunk
-        const int16Data = float32ToInt16(inputData);
-        onAudioChunk?.(int16Data.buffer as ArrayBuffer);
-
-        if (chunkCount % 50 === 0) {
-          logger.debug("AudioStream", "Processing chunk", {
-            chunk: chunkCount,
-            level: level.toFixed(3),
-          });
+      if (typeof event.data === "string") {
+        // Native platforms: decode base64 to ArrayBuffer
+        const binaryString = atob(event.data);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
         }
-      };
-
-      // Connect the audio graph
-      source.connect(workletNode);
-      workletNode.connect(audioContext.destination);
-
-      logger.info("AudioStream", "Web streaming started");
-      return true;
-    } catch (error) {
-      logger.error("AudioStream", "Web streaming error", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      onError?.(error instanceof Error ? error : new Error(String(error)));
-      return false;
-    }
-  }, [sampleRate, createWorkletProcessor, onAudioChunk, onAudioLevel, onError]);
-
-  /**
-   * Start audio streaming for native platforms using expo-audio
-   */
-  const startNativeStreaming = useCallback(async (): Promise<boolean> => {
-    try {
-      logger.info("AudioStream", "Starting native audio streaming", {
-        platform: Platform.OS,
-        isAudioModeReady: isAudioModeReadyRef.current,
-      });
-
-      // Ensure audio mode is ready (set up in useEffect)
-      if (!isAudioModeReadyRef.current) {
-        logger.warn(
-          "AudioStream",
-          "Audio mode not ready, waiting for setup..."
+        audioBuffer = bytes.buffer;
+      } else if (event.data && typeof event.data === "object") {
+        // Web: Uint8Array or Float32Array - get the buffer
+        const typedArray = event.data as Uint8Array | Float32Array;
+        const bufferSlice = typedArray.buffer.slice(
+          typedArray.byteOffset,
+          typedArray.byteOffset + typedArray.byteLength
         );
-        // Wait for audio mode to be ready with timeout
-        const maxWait = 2000;
-        const checkInterval = 100;
-        let waited = 0;
-
-        while (!isAudioModeReadyRef.current && waited < maxWait) {
-          await new Promise((resolve) => setTimeout(resolve, checkInterval));
-          waited += checkInterval;
-        }
-
-        if (!isAudioModeReadyRef.current) {
-          logger.error("AudioStream", "Audio mode setup timed out");
-          return false;
-        }
-      }
-
-      // Verify permission is still granted using AudioModule
-      const permissionStatus = await AudioModule.getRecordingPermissionsAsync();
-      if (!permissionStatus.granted) {
-        logger.error("AudioStream", "Audio permission not granted");
-        // Try requesting again
-        const requestStatus =
-          await AudioModule.requestRecordingPermissionsAsync();
-        if (!requestStatus.granted) {
-          logger.error("AudioStream", "Audio permission denied after request");
-          return false;
-        }
-      }
-
-      // Ensure audio is active
-      logger.debug("AudioStream", "Ensuring audio is active");
-      await setIsAudioActiveAsync(true);
-
-      // Ensure recorder is fully stopped before starting
-      try {
-        if (audioRecorder.isRecording) {
-          logger.debug("AudioStream", "Stopping active recording");
-          await audioRecorder.stop();
-          await new Promise((resolve) => setTimeout(resolve, 100));
-        }
-      } catch (cleanupError) {
-        logger.debug("AudioStream", "Cleanup error (expected)", {
-          error:
-            cleanupError instanceof Error
-              ? cleanupError.message
-              : String(cleanupError),
+        audioBuffer = bufferSlice as ArrayBuffer;
+      } else {
+        logger.warn("AudioStream", "Unknown audio data format", {
+          type: typeof event.data,
         });
+        return;
       }
 
-      // Re-configure audio mode to ensure it's properly set for recording
-      // playsInSilentMode: true ensures audio works even when iOS silent switch is on
-      logger.debug("AudioStream", "Ensuring audio mode is configured");
-      await setAudioModeAsync({
-        allowsRecording: true,
-        playsInSilentMode: true,
-        interruptionMode: "doNotMix",
+      // Send audio chunk to WebSocket via callback
+      onAudioChunkRef.current?.(audioBuffer);
+
+      logger.debug("AudioStream", "Audio chunk processed", {
+        size: audioBuffer.byteLength,
+        position: event.position,
       });
-
-      // Allow time for iOS audio session to configure properly
-      const configureDelay = Platform.OS === "ios" ? 400 : 100;
-      await new Promise((resolve) => setTimeout(resolve, configureDelay));
-
-      // Check recorder state before preparing
-      const recorderStatus = audioRecorder.getStatus();
-      logger.debug("AudioStream", "Recorder status before prepare", {
-        canRecord: recorderStatus.canRecord,
-        isRecording: recorderStatus.isRecording,
-      });
-
-      // Prepare recorder with retry logic and increasing delays
-      let prepareAttempts = 0;
-      const maxAttempts = 4;
-      let lastError: Error | null = null;
-
-      while (prepareAttempts < maxAttempts) {
-        try {
-          prepareAttempts++;
-          logger.debug("AudioStream", "Preparing recorder", {
-            attempt: prepareAttempts,
-          });
-
-          // On retry attempts, try resetting audio session first
-          if (prepareAttempts > 1 && Platform.OS === "ios") {
-            logger.debug("AudioStream", "Resetting audio session before retry");
-            try {
-              await setAudioModeAsync({ allowsRecording: false });
-              await new Promise((resolve) => setTimeout(resolve, 200));
-              await setAudioModeAsync({
-                allowsRecording: true,
-                playsInSilentMode: true,
-                interruptionMode: "doNotMix",
-              });
-              await new Promise((resolve) => setTimeout(resolve, 400));
-            } catch {
-              // Ignore reset errors
-            }
-          }
-
-          await audioRecorder.prepareToRecordAsync();
-          lastError = null;
-          break;
-        } catch (prepareError) {
-          lastError =
-            prepareError instanceof Error
-              ? prepareError
-              : new Error(String(prepareError));
-
-          logger.warn("AudioStream", "Prepare failed", {
-            attempt: prepareAttempts,
-            error: lastError.message,
-          });
-
-          if (prepareAttempts >= maxAttempts) {
-            break;
-          }
-
-          // Exponentially increase wait time before retry
-          const retryDelay = 250 * Math.pow(2, prepareAttempts - 1);
-          logger.debug("AudioStream", "Waiting before retry", {
-            delayMs: retryDelay,
-          });
-          await new Promise((resolve) => setTimeout(resolve, retryDelay));
-        }
-      }
-
-      if (lastError) {
-        throw lastError;
-      }
-
-      logger.debug("AudioStream", "Starting recording");
-      audioRecorder.record();
-
-      logger.info("AudioStream", "Native streaming started");
-      return true;
     } catch (error) {
-      logger.error("AudioStream", "Native streaming error", {
+      logger.error("AudioStream", "Error processing audio chunk", {
         error: error instanceof Error ? error.message : String(error),
       });
-
-      // Attempt recovery: reset audio mode on failure
-      try {
-        await setAudioModeAsync({ allowsRecording: false });
-      } catch {
-        // Ignore cleanup errors
-      }
-
-      onError?.(error instanceof Error ? error : new Error(String(error)));
-      return false;
     }
-  }, [audioRecorder, onError]);
+  }, []);
 
   /**
    * Start audio streaming
@@ -529,17 +236,56 @@ export function useAudioStream(
     logger.stateTransition("AudioStream", status, "initializing");
     setStatus("initializing");
 
-    const success =
-      Platform.OS === "web"
-        ? await startWebStreaming()
-        : await startNativeStreaming();
+    try {
+      // Request microphone permission
+      const permissionResult =
+        await ExpoAudioStreamModule.requestPermissionsAsync();
 
-    const newStatus = success ? "streaming" : "error";
-    logger.stateTransition("AudioStream", "initializing", newStatus);
-    setStatus(newStatus);
+      if (permissionResult.status !== "granted") {
+        logger.error("AudioStream", "Microphone permission denied");
+        onErrorRef.current?.(new Error("Microphone permission denied"));
+        setStatus("error");
+        return false;
+      }
 
-    return success;
-  }, [status, startWebStreaming, startNativeStreaming]);
+      // Configure recording for WebSocket streaming
+      const recordingConfig: RecordingConfig = {
+        sampleRate: sampleRate as 16000 | 44100 | 48000,
+        channels: STREAM_CONFIG.CHANNELS,
+        encoding: STREAM_CONFIG.ENCODING,
+        interval,
+        enableProcessing: true, // Enable RMS analysis for visualization
+        features: {
+          energy: true,
+        },
+        onAudioStream: handleAudioStream,
+      };
+
+      logger.info("AudioStream", "Starting recording with config", {
+        sampleRate,
+        channels: STREAM_CONFIG.CHANNELS,
+        encoding: STREAM_CONFIG.ENCODING,
+        interval,
+      });
+
+      // Start recording - this will begin streaming audio chunks
+      await startRecording(recordingConfig);
+
+      logger.stateTransition("AudioStream", "initializing", "streaming");
+      setStatus("streaming");
+
+      return true;
+    } catch (error) {
+      logger.error("AudioStream", "Failed to start streaming", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      onErrorRef.current?.(
+        error instanceof Error ? error : new Error(String(error))
+      );
+      setStatus("error");
+      return false;
+    }
+  }, [status, sampleRate, interval, startRecording, handleAudioStream]);
 
   /**
    * Stop audio streaming and clean up resources
@@ -547,126 +293,113 @@ export function useAudioStream(
   const stopStreaming = useCallback(async () => {
     logger.info("AudioStream", "Stopping streaming", { platform: Platform.OS });
 
-    if (Platform.OS === "web") {
-      if (workletNodeRef.current) {
-        workletNodeRef.current.disconnect();
-        workletNodeRef.current.port.close();
-        workletNodeRef.current = null;
-      }
-
-      if (audioContextRef.current) {
-        await audioContextRef.current.close();
-        audioContextRef.current = null;
-      }
-
-      mediaStreamRef.current?.getTracks().forEach((track) => track.stop());
-      mediaStreamRef.current = null;
-    } else {
-      try {
-        if (audioRecorder.isRecording) {
-          logger.debug("AudioStream", "Stopping recorder");
-          await audioRecorder.stop();
-          // Wait for recorder to fully stop before changing audio mode
-          await new Promise((resolve) => setTimeout(resolve, 100));
-        }
-      } catch (error) {
-        logger.debug("AudioStream", "Stop recorder error (expected)", {
-          error: error instanceof Error ? error.message : String(error),
-        });
-      }
-
-      try {
-        logger.debug("AudioStream", "Resetting audio mode");
-        await setAudioModeAsync({ allowsRecording: false });
-      } catch (error) {
-        logger.debug("AudioStream", "Reset audio mode error (expected)", {
-          error: error instanceof Error ? error.message : String(error),
-        });
-      }
+    try {
+      await stopRecording();
+    } catch (error) {
+      logger.debug("AudioStream", "Stop recording error (expected)", {
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
 
     setAudioLevel(0);
     setStatus("idle");
     logger.info("AudioStream", "Streaming stopped");
-  }, [audioRecorder]);
+  }, [stopRecording]);
 
   /**
    * Pause audio streaming
    */
-  const pauseStreaming = useCallback(() => {
+  const handlePauseStreaming = useCallback(async () => {
     if (status !== "streaming") return;
 
     logger.info("AudioStream", "Pausing");
 
-    if (Platform.OS === "web") {
-      audioContextRef.current?.suspend();
-    } else {
-      try {
-        audioRecorder.pause();
-      } catch (error) {
-        logger.debug("AudioStream", "Pause error", {
-          error: error instanceof Error ? error.message : String(error),
-        });
-      }
+    try {
+      await pauseRecording();
+      setStatus("paused");
+    } catch (error) {
+      logger.error("AudioStream", "Pause error", {
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
-
-    setStatus("paused");
-  }, [status, audioRecorder]);
+  }, [status, pauseRecording]);
 
   /**
    * Resume audio streaming
    */
-  const resumeStreaming = useCallback(() => {
+  const handleResumeStreaming = useCallback(async () => {
     if (status !== "paused") return;
 
     logger.info("AudioStream", "Resuming");
 
-    if (Platform.OS === "web") {
-      audioContextRef.current?.resume();
-    } else {
-      try {
-        audioRecorder.record();
-      } catch (error) {
-        logger.debug("AudioStream", "Resume error", {
-          error: error instanceof Error ? error.message : String(error),
-        });
-      }
+    try {
+      await resumeRecording();
+      setStatus("streaming");
+    } catch (error) {
+      logger.error("AudioStream", "Resume error", {
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
-
-    setStatus("streaming");
-  }, [status, audioRecorder]);
+  }, [status, resumeRecording]);
 
   /**
-   * Play received audio data (web only)
+   * Play received audio data (for AI agent responses)
    */
   const playAudio = useCallback(async (audioData: ArrayBuffer) => {
     try {
-      if (Platform.OS !== "web" || !audioContextRef.current) {
-        logger.warn("AudioStream", "Playback only supported on web");
-        return;
+      if (Platform.OS === "web") {
+        // Web: Use Web Audio API
+        if (!audioContextRef.current) {
+          audioContextRef.current = new AudioContext();
+        }
+
+        const audioBuffer = await audioContextRef.current.decodeAudioData(
+          audioData.slice(0)
+        );
+
+        const source = audioContextRef.current.createBufferSource();
+        source.buffer = audioBuffer;
+        source.connect(audioContextRef.current.destination);
+
+        playbackSourceRef.current = source;
+
+        source.onended = () => {
+          playbackSourceRef.current = null;
+          setIsPlaying(false);
+        };
+
+        source.start();
+        setIsPlaying(true);
+
+        logger.debug("AudioStream", "Playing audio", {
+          duration: audioBuffer.duration.toFixed(2),
+        });
+      } else {
+        // Native: Use expo-audio for playback
+        const base64Data = arrayBufferToBase64(audioData);
+        const audioUri = `data:audio/wav;base64,${base64Data}`;
+
+        // Configure audio mode for playback
+        await setAudioModeAsync({
+          playsInSilentMode: true,
+        });
+
+        // Create audio player
+        const player = createAudioPlayer(audioUri);
+
+        setIsPlaying(true);
+
+        // Listen for playback completion
+        player.addListener("playbackStatusUpdate", (status) => {
+          if (status.didJustFinish) {
+            setIsPlaying(false);
+            player.remove();
+          }
+        });
+
+        // Start playback
+        player.play();
       }
-
-      const audioBuffer = await audioContextRef.current.decodeAudioData(
-        audioData.slice(0)
-      );
-
-      const source = audioContextRef.current.createBufferSource();
-      source.buffer = audioBuffer;
-      source.connect(audioContextRef.current.destination);
-
-      playbackSourceRef.current = source;
-
-      source.onended = () => {
-        playbackSourceRef.current = null;
-        setIsPlaying(false);
-      };
-
-      source.start();
-      setIsPlaying(true);
-
-      logger.debug("AudioStream", "Playing audio", {
-        duration: audioBuffer.duration.toFixed(2),
-      });
     } catch (error) {
       logger.error("AudioStream", "Playback error", {
         error: error instanceof Error ? error.message : String(error),
@@ -678,7 +411,7 @@ export function useAudioStream(
    * Stop audio playback
    */
   const stopPlayback = useCallback(() => {
-    if (playbackSourceRef.current) {
+    if (Platform.OS === "web" && playbackSourceRef.current) {
       try {
         playbackSourceRef.current.stop();
       } catch {
@@ -695,6 +428,11 @@ export function useAudioStream(
   useEffect(() => {
     return () => {
       stopStreaming();
+
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
     };
   }, [stopStreaming]);
 
@@ -702,11 +440,23 @@ export function useAudioStream(
     status,
     startStreaming,
     stopStreaming,
-    pauseStreaming,
-    resumeStreaming,
+    pauseStreaming: handlePauseStreaming,
+    resumeStreaming: handleResumeStreaming,
     audioLevel,
     playAudio,
     stopPlayback,
     isPlaying,
   };
+}
+
+/**
+ * Convert ArrayBuffer to base64 string for native audio playback
+ */
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
 }

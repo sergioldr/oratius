@@ -27,7 +27,7 @@ export default function WelcomeScreen() {
     setIsSigningIn(true);
     try {
       await signInAnonymously();
-      router.replace("/(auth)/home");
+      router.replace("/(auth)/(tabs)/home");
     } catch (error) {
       console.error("Failed to sign in anonymously:", error);
       // TODO: Show error toast/alert to user
