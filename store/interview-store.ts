@@ -1,11 +1,20 @@
 import { create } from "zustand";
 import { useShallow } from "zustand/react/shallow";
 
-import type {
-  ConversationTextMessage,
-  InterviewSession,
-  ServerMessage,
-} from "@/lib/websocket";
+// Types moved from removed websocket library
+export interface ConversationTextMessage {
+  event_type: "conversation_text";
+  role: "user" | "assistant";
+  text: string;
+}
+
+export interface InterviewSession {
+  id: string;
+  status: string;
+  created_at: string;
+}
+
+export type ServerMessage = ConversationTextMessage | { event_type: string };
 
 /**
  * WebSocket connection status

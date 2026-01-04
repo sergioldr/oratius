@@ -1,18 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import { router, Stack, useLocalSearchParams } from "expo-router";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  Pressable,
-  useColorScheme,
-} from "react-native";
+import { router, Stack } from "expo-router";
+import React, { useCallback, useMemo } from "react";
+import { Alert, Pressable, useColorScheme } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, XStack, YStack } from "tamagui";
@@ -20,20 +9,18 @@ import { Text, XStack, YStack } from "tamagui";
 import { InterviewTimer, SecondaryButton, Tag } from "@/components/ui";
 import { VoiceOrb } from "@/components/voice-orb";
 import { getDefaultScreenOptions } from "@/constants/navigation";
-import { useAudioStream } from "@/hooks/use-audio-stream";
-import { useWebSocketInterview } from "@/hooks/use-websocket-interview";
-import { logger } from "@/lib/logger";
-import {
-  useInterviewAgentStatus,
-  useInterviewConnection,
-  useInterviewConversation,
-  useInterviewStore,
-  type AgentStatus,
-} from "@/store/interview-store";
-import { useProfileStore } from "@/store/profile-store";
+
+// Mock data
+const MOCK_CONNECTION_STATUS = "ready";
+const MOCK_AGENT_STATUS = "listening";
+const MOCK_QUESTION_COUNT = 3;
+const MOCK_CURRENT_QUESTION =
+  "Tell me about a time when you had to overcome a significant challenge in your career.";
+const MOCK_IS_STREAMING = false;
+const MOCK_AUDIO_LEVEL = 0.3;
 
 /**
- * Status messages for different connection states
+ * Status messages for different connection states (mock)
  */
 const STATUS_MESSAGES: Record<string, string> = {
   disconnected: "Connecting to interview...",
@@ -45,10 +32,10 @@ const STATUS_MESSAGES: Record<string, string> = {
 };
 
 /**
- * Get status indicator config based on agent status
+ * Get status indicator config based on agent status (mock)
  */
 function getStatusIndicator(
-  agentStatus: AgentStatus,
+  agentStatus: string,
   isStreaming: boolean
 ): {
   variant: "primary" | "error";
@@ -89,139 +76,38 @@ function getStatusIndicator(
 }
 
 /**
- * Voice Interview Practice Screen
- * Real-time AI interview session with WebSocket voice connection
+ * Voice Interview Practice Screen (UI Only - No Logic)
+ * Mock implementation showing interview UI structure
  */
 export default function VoiceInterviewScreen() {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const defaultScreenOptions = getDefaultScreenOptions(colorScheme);
-  const params = useLocalSearchParams<{
-    candidate_name?: string;
-    job_role?: string;
-    sector?: string;
-    seniority?: string;
-    language?: string;
-  }>();
 
-  // Profile store state
-  const { profile } = useProfileStore();
+  // Mock state values
+  const connectionStatus = MOCK_CONNECTION_STATUS;
+  const agentStatus = MOCK_AGENT_STATUS;
+  const currentQuestion = MOCK_CURRENT_QUESTION;
+  const questionCount = MOCK_QUESTION_COUNT;
+  const audioLevel = MOCK_AUDIO_LEVEL;
+  const isStreaming = MOCK_IS_STREAMING;
+  const isReady = connectionStatus === "ready";
+  const isLoading = false; // Mock loading state
 
-  // Interview store state
-  const { connectionStatus, lastError } = useInterviewConnection();
-  const { currentQuestion, questionCount } = useInterviewConversation();
-  const { agentStatus, audioLevel: storeAudioLevel } =
-    useInterviewAgentStatus();
-  const { incrementElapsedSeconds, reset: resetStore } = useInterviewStore();
-
-  // Local state
-  const [isInitialized, setIsInitialized] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  // Ref to hold sendAudioChunk to avoid circular dependency
-  const sendAudioChunkRef = useRef<((data: ArrayBuffer) => void) | null>(null);
-
-  // Audio streaming hook - connects to WebSocket via onAudioChunk callback
-  const {
-    status: audioStatus,
-    startStreaming,
-    stopStreaming,
-    audioLevel: streamAudioLevel,
-    playAudio,
-  } = useAudioStream({
-    onAudioChunk: useCallback((chunk: ArrayBuffer) => {
-      // Send audio chunk to WebSocket for real-time streaming
-      sendAudioChunkRef.current?.(chunk);
-    }, []),
-    onAudioLevel: (level) => {
-      useInterviewStore.getState().setAudioLevel(level);
-    },
-  });
-
-  // WebSocket interview hook
-  const { startInterview, endInterview, disconnect, sendAudioChunk, isReady } =
-    useWebSocketInterview({
-      onReady: useCallback(async () => {
-        logger.info(
-          "VoiceInterview",
-          "WebSocket ready - starting audio stream"
-        );
-        await startStreaming();
-        logger.debug("VoiceInterview", "Audio stream started");
-      }, [startStreaming]),
-      onAudioData: useCallback(
-        (data: ArrayBuffer) => {
-          logger.debug("VoiceInterview", "Received audio from WebSocket", {
-            sizeBytes: data.byteLength,
-            sizeKB: (data.byteLength / 1024).toFixed(2),
-          });
-
-          // Check if data is valid
-          if (!data || data.byteLength === 0) {
-            logger.warn("VoiceInterview", "Received empty audio data");
-            return;
-          }
-
-          logger.debug(
-            "VoiceInterview",
-            "Calling playAudio with received data"
-          );
-          playAudio(data).catch((error) => {
-            logger.error("VoiceInterview", "Error playing audio", {
-              error: error instanceof Error ? error.message : String(error),
-            });
-          });
-        },
-        [playAudio]
-      ),
-      onInterviewEnd: useCallback(async () => {
-        logger.info("VoiceInterview", "Interview ended - stopping audio first");
-        await stopStreaming();
-        logger.info("VoiceInterview", "Audio stopped - navigating to home");
-        router.replace("/(auth)/(tabs)/home");
-      }, [stopStreaming]),
-    });
-
-  // Derive audio level from stream or store
-  const audioLevel =
-    audioStatus === "streaming" ? streamAudioLevel : storeAudioLevel;
-
-  /**
-   * Handle connection errors - disconnect and navigate home
-   */
-  useEffect(() => {
-    if (connectionStatus === "error") {
-      logger.error("VoiceInterview", "Connection error - ending session", {
-        error: lastError,
-      });
-
-      (async () => {
-        try {
-          await stopStreaming();
-        } catch (error) {
-          // Ignore cleanup errors
-        }
-        disconnect();
-        router.replace("/(auth)/(tabs)/home");
-      })();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connectionStatus, lastError]);
-
-  // Voice orb animation values based on audio level and agent status
+  // Voice orb animation values based on mock audio level and agent status
   const orbValues = useMemo(() => {
-    const level = agentStatus === "speaking" ? 0.6 : audioLevel;
+    // Use audioLevel directly since agentStatus is 'listening' in mock
+    const level = audioLevel;
     return {
       amplitude: 0.3 + level * 0.4,
       speed: 0.5 + level * 0.5,
       scale: 1 + level * 0.15,
       glowOpacity: 0.6 + level * 0.4,
     };
-  }, [audioLevel, agentStatus]);
+  }, [audioLevel]);
 
-  // Display question (from WebSocket or placeholder)
-  const displayQuestion =
-    currentQuestion ?? "Preparing your interview question...";
+  // Display question
+  const displayQuestion = currentQuestion;
 
   /**
    * Calculate adaptive font size based on question length
@@ -236,130 +122,9 @@ export default function VoiceInterviewScreen() {
   const adaptiveLineHeight = adaptiveFontSize * 1.3;
 
   /**
-   * Initialize interview session on mount
-   */
-  useEffect(() => {
-    const initializeInterview = async () => {
-      if (isInitialized) return;
-
-      logger.info("VoiceInterview", "Initializing interview session");
-      logger.debug("VoiceInterview", "URL params", { params });
-      logger.debug("VoiceInterview", "Profile data", {
-        name: profile.name,
-        role: profile.jobRole,
-        industry: profile.industry,
-        seniority: profile.seniority,
-        language: profile.language,
-      });
-
-      setIsInitialized(true);
-
-      // Map language locale to language name (e.g., "en-US" -> "English")
-      const languageMap: Record<string, string> = {
-        "en-US": "English",
-        "es-ES": "Spanish",
-        // Add more mappings as needed
-      };
-
-      const interviewParams = {
-        candidate_name: params.candidate_name ?? (profile.name || "Candidate"),
-        job_role: params.job_role ?? (profile.jobRole || "Professional"),
-        sector: params.sector ?? (profile.industry || "Technology"),
-        seniority: params.seniority ?? (profile.seniority || "Mid-Level"),
-        language: params.language ?? languageMap[profile.language] ?? "English",
-      };
-
-      logger.info(
-        "VoiceInterview",
-        "Starting interview with params",
-        interviewParams
-      );
-      const success = await startInterview(interviewParams);
-
-      if (!success) {
-        logger.error("VoiceInterview", "Failed to start interview session");
-        Alert.alert(
-          "Connection Error",
-          "Failed to start the interview session. Please try again.",
-          [
-            {
-              text: "Go Back",
-              onPress: () => {
-                logger.info(
-                  "VoiceInterview",
-                  "User cancelled after connection error"
-                );
-                router.back();
-              },
-            },
-          ]
-        );
-      } else {
-        logger.info("VoiceInterview", "Interview session started successfully");
-      }
-    };
-
-    initializeInterview();
-  }, [isInitialized, params, profile, startInterview]);
-
-  /**
-   * Start elapsed time timer when ready
-   */
-  useEffect(() => {
-    if (isReady && !timerRef.current) {
-      logger.info("VoiceInterview", "Starting interview timer");
-      timerRef.current = setInterval(() => {
-        incrementElapsedSeconds();
-      }, 1000);
-    }
-
-    return () => {
-      if (timerRef.current) {
-        logger.debug("VoiceInterview", "Stopping interview timer");
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-    };
-  }, [isReady, incrementElapsedSeconds]);
-
-  /**
-   * Send audio chunks to WebSocket when streaming
-   */
-  useEffect(() => {
-    // Connect sendAudioChunk from WebSocket hook to the ref
-    // This allows useAudioStream to send chunks without circular dependency
-    sendAudioChunkRef.current = sendAudioChunk;
-  }, [sendAudioChunk]);
-
-  /**
-   * Cleanup on unmount
-   */
-  useEffect(() => {
-    return () => {
-      logger.info("VoiceInterview", "Component unmounting - cleaning up");
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-      // Clean up audio and WebSocket
-      (async () => {
-        try {
-          await stopStreaming();
-        } catch (error) {
-          // Ignore cleanup errors
-        }
-      })();
-      disconnect();
-      useInterviewStore.getState().reset();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  /**
-   * Handle end interview with confirmation
+   * Handle end interview with confirmation (mock)
    */
   const handleEnd = useCallback(() => {
-    logger.info("VoiceInterview", "User requested to end interview");
     Alert.alert(
       "End Interview",
       "Are you sure you want to end this interview session?",
@@ -367,29 +132,17 @@ export default function VoiceInterviewScreen() {
         {
           text: "Cancel",
           style: "cancel",
-          onPress: () =>
-            logger.debug("VoiceInterview", "User cancelled end interview"),
         },
         {
           text: "End",
           style: "destructive",
-          onPress: async () => {
-            logger.info("VoiceInterview", "User confirmed end interview");
-            try {
-              await stopStreaming();
-              logger.debug("VoiceInterview", "Audio streaming stopped");
-              await endInterview();
-              logger.info("VoiceInterview", "Interview ended");
-            } catch (error) {
-              logger.error("VoiceInterview", "Error during interview cleanup", {
-                error: error instanceof Error ? error.message : String(error),
-              });
-            }
+          onPress: () => {
+            router.replace("/(auth)/(tabs)/home");
           },
         },
       ]
     );
-  }, [stopStreaming, endInterview]);
+  }, []);
 
   /**
    * Handle close button (same as end)
@@ -399,29 +152,14 @@ export default function VoiceInterviewScreen() {
   }, [handleEnd]);
 
   /**
-   * Toggle audio streaming (pause/resume)
+   * Toggle audio streaming (mock - does nothing)
    */
-  const handleToggleStreaming = useCallback(async () => {
-    logger.info("VoiceInterview", "User toggled audio streaming", {
-      currentStatus: audioStatus,
-    });
-
-    if (audioStatus === "streaming") {
-      logger.debug("VoiceInterview", "Stopping audio stream");
-      await stopStreaming();
-      logger.info("VoiceInterview", "Audio stream paused");
-    } else if (audioStatus === "idle" || audioStatus === "paused") {
-      logger.debug("VoiceInterview", "Starting audio stream");
-      await startStreaming();
-      logger.info("VoiceInterview", "Audio stream resumed");
-    }
-  }, [audioStatus, startStreaming, stopStreaming]);
+  const handleToggleStreaming = useCallback(() => {
+    Alert.alert("Mock Action", "Toggle streaming - Not implemented");
+  }, []);
 
   // Status indicator configuration
-  const statusIndicator = getStatusIndicator(
-    agentStatus,
-    audioStatus === "streaming"
-  );
+  const statusIndicator = getStatusIndicator(agentStatus, isStreaming);
 
   // Screen options
   const screenOptions = useMemo(
@@ -447,12 +185,6 @@ export default function VoiceInterviewScreen() {
     }),
     [defaultScreenOptions.headerTintColor, colorScheme, handleClose]
   );
-
-  // Loading state while connecting
-  const isLoading =
-    connectionStatus === "disconnected" ||
-    connectionStatus === "connecting" ||
-    connectionStatus === "connected";
 
   return (
     <YStack
@@ -496,41 +228,22 @@ export default function VoiceInterviewScreen() {
 
       {/* Main Content */}
       <YStack flex={1} paddingHorizontal="$6">
-        {/* Question Text or Loading State */}
+        {/* Question Text */}
         <Animated.View
-          key={currentQuestion ?? "loading"}
+          key={currentQuestion}
           entering={FadeIn.duration(400)}
           exiting={FadeOut.duration(200)}
         >
-          {isLoading ? (
-            <YStack alignItems="center" marginTop="$6" gap="$4">
-              <ActivityIndicator size="large" color="#2547f4" />
-              <Text
-                fontSize={20}
-                fontWeight="500"
-                textAlign="center"
-                color="$gray11"
-              >
-                {STATUS_MESSAGES[connectionStatus]}
-              </Text>
-              {lastError && (
-                <Text fontSize={14} textAlign="center" color="$red10">
-                  {lastError}
-                </Text>
-              )}
-            </YStack>
-          ) : (
-            <Text
-              fontSize={adaptiveFontSize}
-              fontWeight="700"
-              lineHeight={adaptiveLineHeight}
-              textAlign="center"
-              color="$color"
-              marginTop="$6"
-            >
-              {displayQuestion}
-            </Text>
-          )}
+          <Text
+            fontSize={adaptiveFontSize}
+            fontWeight="700"
+            lineHeight={adaptiveLineHeight}
+            textAlign="center"
+            color="$color"
+            marginTop="$6"
+          >
+            {displayQuestion}
+          </Text>
         </Animated.View>
 
         {/* Voice Orb Container */}
@@ -541,7 +254,7 @@ export default function VoiceInterviewScreen() {
           marginVertical="$8"
         >
           <VoiceOrb
-            isRecording={isReady && audioStatus === "streaming"}
+            isRecording={isReady && isStreaming}
             glowOpacity={orbValues.glowOpacity}
             scale={orbValues.scale}
             amplitude={orbValues.amplitude}
@@ -579,7 +292,7 @@ export default function VoiceInterviewScreen() {
                 onPress={handleToggleStreaming}
                 disabled={!isReady}
               >
-                {audioStatus === "streaming" ? "Pause" : "Resume"}
+                {isStreaming ? "Pause" : "Resume"}
               </SecondaryButton>
             </YStack>
 

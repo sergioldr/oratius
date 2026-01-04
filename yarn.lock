@@ -3193,18 +3193,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@siteed/expo-audio-studio@npm:^2.18.1":
-  version: 2.18.1
-  resolution: "@siteed/expo-audio-studio@npm:2.18.1"
-  peerDependencies:
-    expo: "*"
-    expo-modules-core: ~2.4.0
-    react: "*"
-    react-native: "*"
-  checksum: 10c0/5d95bd61337f6f2b9f2db9e2d8cf9839a595558ebb4db59d4f6a83520b95c0b3141e12edd3d9b1510d7a0db9f309cd001623037565bbeb29e9199d5aa9cb8a51
-  languageName: node
-  linkType: hard
-
 "@supabase/auth-js@npm:2.89.0":
   version: 2.89.0
   resolution: "@supabase/auth-js@npm:2.89.0"
@@ -7851,7 +7839,6 @@ __metadata:
     "@react-navigation/elements": "npm:2.9.1"
     "@react-navigation/native": "npm:7.1.8"
     "@shopify/react-native-skia": "npm:2.2.12"
-    "@siteed/expo-audio-studio": "npm:^2.18.1"
     "@supabase/supabase-js": "npm:2.89.0"
     "@tamagui/babel-plugin": "npm:1.139.1"
     "@tamagui/config": "npm:1.139.1"
