@@ -5,7 +5,7 @@ import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, XStack, YStack } from "tamagui";
 
-import { Iridescence } from "@/components/iridescence";
+import { Iridescence } from "@/components/iridescence-skia";
 import { PulsingMicButton } from "@/components/pulsing-mic-button";
 import { HeroStreakCard, Select, StatCard } from "@/components/ui";
 import { useAudioPermission } from "@/hooks/use-audio-permission";

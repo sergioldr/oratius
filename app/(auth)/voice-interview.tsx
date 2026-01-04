@@ -151,17 +151,33 @@ export default function VoiceInterviewScreen() {
       }, [startStreaming]),
       onAudioData: useCallback(
         (data: ArrayBuffer) => {
-          logger.debug("VoiceInterview", "Playing received audio", {
+          logger.debug("VoiceInterview", "Received audio from WebSocket", {
             sizeBytes: data.byteLength,
             sizeKB: (data.byteLength / 1024).toFixed(2),
           });
-          playAudio(data);
+
+          // Check if data is valid
+          if (!data || data.byteLength === 0) {
+            logger.warn("VoiceInterview", "Received empty audio data");
+            return;
+          }
+
+          logger.debug(
+            "VoiceInterview",
+            "Calling playAudio with received data"
+          );
+          playAudio(data).catch((error) => {
+            logger.error("VoiceInterview", "Error playing audio", {
+              error: error instanceof Error ? error.message : String(error),
+            });
+          });
         },
         [playAudio]
       ),
-      onInterviewEnd: useCallback(() => {
-        logger.info("VoiceInterview", "Interview ended - navigating to home");
-        stopStreaming();
+      onInterviewEnd: useCallback(async () => {
+        logger.info("VoiceInterview", "Interview ended - stopping audio first");
+        await stopStreaming();
+        logger.info("VoiceInterview", "Audio stopped - navigating to home");
         router.replace("/(auth)/(tabs)/home");
       }, [stopStreaming]),
     });
@@ -178,11 +194,19 @@ export default function VoiceInterviewScreen() {
       logger.error("VoiceInterview", "Connection error - ending session", {
         error: lastError,
       });
-      stopStreaming();
-      disconnect();
-      router.replace("/(auth)/(tabs)/home");
+
+      (async () => {
+        try {
+          await stopStreaming();
+        } catch (error) {
+          // Ignore cleanup errors
+        }
+        disconnect();
+        router.replace("/(auth)/(tabs)/home");
+      })();
     }
-  }, [connectionStatus, lastError, stopStreaming, disconnect]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connectionStatus, lastError]);
 
   // Voice orb animation values based on audio level and agent status
   const orbValues = useMemo(() => {
@@ -315,10 +339,21 @@ export default function VoiceInterviewScreen() {
       logger.info("VoiceInterview", "Component unmounting - cleaning up");
       if (timerRef.current) {
         clearInterval(timerRef.current);
+        timerRef.current = null;
       }
-      resetStore();
+      // Clean up audio and WebSocket
+      (async () => {
+        try {
+          await stopStreaming();
+        } catch (error) {
+          // Ignore cleanup errors
+        }
+      })();
+      disconnect();
+      useInterviewStore.getState().reset();
     };
-  }, [resetStore]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /**
    * Handle end interview with confirmation
@@ -340,10 +375,16 @@ export default function VoiceInterviewScreen() {
           style: "destructive",
           onPress: async () => {
             logger.info("VoiceInterview", "User confirmed end interview");
-            await stopStreaming();
-            logger.debug("VoiceInterview", "Audio streaming stopped");
-            await endInterview();
-            logger.info("VoiceInterview", "Interview ended");
+            try {
+              await stopStreaming();
+              logger.debug("VoiceInterview", "Audio streaming stopped");
+              await endInterview();
+              logger.info("VoiceInterview", "Interview ended");
+            } catch (error) {
+              logger.error("VoiceInterview", "Error during interview cleanup", {
+                error: error instanceof Error ? error.message : String(error),
+              });
+            }
           },
         },
       ]

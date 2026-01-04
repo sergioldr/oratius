@@ -9,7 +9,7 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from "react-native-reanimated";
-import { Iridescence } from "./iridescence";
+import { Iridescence } from "./iridescence-skia";
 
 interface VoiceOrbProps {
   isRecording: boolean;

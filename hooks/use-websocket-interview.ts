@@ -156,8 +156,17 @@ export function useWebSocketInterview(
           logger.debug("WebSocket", "Received binary audio data", {
             sizeBytes: audioSize,
             sizeKB: (audioSize / 1024).toFixed(2),
+            hasOnAudioData: !!onAudioData,
           });
-          onAudioData?.(event.data);
+
+          if (onAudioData) {
+            onAudioData(event.data);
+          } else {
+            logger.warn(
+              "WebSocket",
+              "Received audio but no onAudioData callback"
+            );
+          }
           return;
         }
 
